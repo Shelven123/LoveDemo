@@ -37,6 +37,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
@@ -94,32 +95,68 @@
         Discover Hosts
     </div>
 
-    <div class="card">
-
-        <div class="avatar">
-            👩
-        </div>
-
-        <div class="name">
-            Amy
-        </div>
-
-        <div class="bio">
-            Friendly and love chatting 😊
-        </div>
-
-        <button onclick="openAmy()">
-            Chat with Amy
-        </button>
-
+    <div id="hosts">
+        Loading hosts...
     </div>
 
 </div>
 
 <script>
-    function openAmy() {
-        alert("You selected Amy ❤️");
+    const SUPABASE_URL = "https://aodkljvskeuumrqesynm.supabase.co";
+
+    const SUPABASE_KEY = "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+
+    async function loadHosts() {
+
+        const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/Profile?role=eq.host&select=*`,
+            {
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${SUPABASE_KEY}`
+                }
+            }
+        );
+
+        const hosts = await response.json();
+
+        const container = document.getElementById("hosts");
+
+        container.innerHTML = "";
+
+        hosts.forEach(host => {
+
+            const card = document.createElement("div");
+
+            card.className = "card";
+
+            card.innerHTML = `
+                <div class="avatar">
+                    👩
+                </div>
+
+                <div class="name">
+                    ${host.username}
+                </div>
+
+                <div class="bio">
+                    ${host.bio || ""}
+                </div>
+
+                <button onclick="openHost('${host.username}')">
+                    Chat with ${host.username}
+                </button>
+            `;
+
+            container.appendChild(card);
+        });
     }
+
+    function openHost(name) {
+        alert("You selected " + name + " ❤️");
+    }
+
+    loadHosts();
 </script>
 
 </body>
