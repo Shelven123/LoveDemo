@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>LoveDemo</title>
 
     <style>
@@ -36,26 +37,26 @@
         .card {
             background: white;
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .avatar {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             background: #ffd6e3;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 45px;
+            font-size: 55px;
             margin: auto;
         }
 
         .name {
             text-align: center;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             margin-top: 15px;
         }
@@ -63,7 +64,14 @@
         .bio {
             text-align: center;
             color: #666;
-            margin: 10px 0 20px;
+            margin: 12px 0 20px;
+            line-height: 1.5;
+        }
+
+        .diamonds {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 20px;
         }
 
         button {
@@ -80,6 +88,19 @@
         button:hover {
             background: #e63e6d;
         }
+
+        .back {
+            background: #888;
+            margin-top: 10px;
+        }
+
+        .back:hover {
+            background: #666;
+        }
+
+        #profilePage {
+            display: none;
+        }
     </style>
 </head>
 
@@ -89,22 +110,72 @@
     ❤️ LoveDemo
 </header>
 
+
 <div class="container">
 
-    <div class="title">
-        Discover Hosts
+    <!-- HOST LIST -->
+
+    <div id="hostList">
+
+        <div class="title">
+            Discover Hosts
+        </div>
+
+        <div id="hosts">
+            Loading hosts...
+        </div>
+
     </div>
 
-    <div id="hosts">
-        Loading hosts...
+
+    <!-- AMY PROFILE -->
+
+    <div id="profilePage">
+
+        <div class="card">
+
+            <div class="avatar">
+                👩
+            </div>
+
+            <div class="name" id="profileName">
+                Amy
+            </div>
+
+            <div class="bio" id="profileBio">
+                Friendly and love chatting 😊
+            </div>
+
+            <div class="diamonds">
+                💎 <span id="profileDiamonds">0</span> Diamonds
+            </div>
+
+            <button onclick="startChat()">
+                💬 Chat with Amy
+            </button>
+
+            <button class="back" onclick="goBack()">
+                ← Back
+            </button>
+
+        </div>
+
     </div>
 
 </div>
 
-<script>
-    const SUPABASE_URL = "https://aodkljvskeuumrqesynm.supabase.co";
 
-    const SUPABASE_KEY = "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+<script>
+
+    const SUPABASE_URL =
+        "https://aodkljvskeuumrqesynm.supabase.co";
+
+    const SUPABASE_KEY =
+        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+
+
+    let selectedHost = null;
+
 
     async function loadHosts() {
 
@@ -118,19 +189,27 @@
             }
         );
 
+
         const hosts = await response.json();
 
-        const container = document.getElementById("hosts");
+
+        const container =
+            document.getElementById("hosts");
+
 
         container.innerHTML = "";
 
+
         hosts.forEach(host => {
 
-            const card = document.createElement("div");
+            const card =
+                document.createElement("div");
 
             card.className = "card";
 
+
             card.innerHTML = `
+
                 <div class="avatar">
                     👩
                 </div>
@@ -143,20 +222,82 @@
                     ${host.bio || ""}
                 </div>
 
-                <button onclick="openHost('${host.username}')">
-                    Chat with ${host.username}
+                <button>
+                    View Profile
                 </button>
+
             `;
 
+
+            card.querySelector("button")
+                .addEventListener("click", function() {
+
+                    openProfile(host);
+
+                });
+
+
             container.appendChild(card);
+
         });
+
     }
 
-    function openHost(name) {
-        alert("You selected " + name + " ❤️");
+
+    function openProfile(host) {
+
+        selectedHost = host;
+
+
+        document.getElementById("hostList")
+            .style.display = "none";
+
+
+        document.getElementById("profilePage")
+            .style.display = "block";
+
+
+        document.getElementById("profileName")
+            .textContent = host.username;
+
+
+        document.getElementById("profileBio")
+            .textContent =
+                host.bio || "";
+
+
+        document.getElementById("profileDiamonds")
+            .textContent =
+                host.diamonds || 0;
+
     }
+
+
+    function goBack() {
+
+        document.getElementById("profilePage")
+            .style.display = "none";
+
+
+        document.getElementById("hostList")
+            .style.display = "block";
+
+    }
+
+
+    function startChat() {
+
+        alert(
+            "Chat with " +
+            selectedHost.username +
+            " ❤️"
+        );
+
+    }
+
 
     loadHosts();
+
 </script>
 
 </body>
