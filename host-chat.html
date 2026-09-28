@@ -10,6 +10,8 @@
 
 <title>LoveDemo Host Chat</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 
 * {
@@ -26,13 +28,17 @@ body {
     height: 65px;
     background: white;
     border-bottom: 1px solid #eee;
+
     display: flex;
     align-items: center;
+
     padding: 0 15px;
+
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+
     z-index: 10;
 }
 
@@ -71,6 +77,7 @@ body {
     margin-bottom: 12px;
     font-size: 15px;
     line-height: 1.4;
+    word-wrap: break-word;
 }
 
 .host-message {
@@ -82,6 +89,7 @@ body {
 
 .user-message {
     background: white;
+    color: #222;
     margin-right: auto;
     border-bottom-left-radius: 5px;
 }
@@ -97,35 +105,46 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
+
     background: white;
     border-top: 1px solid #eee;
+
     padding: 10px;
 }
 
 .input-box {
     max-width: 700px;
     margin: auto;
+
     display: flex;
     gap: 8px;
 }
 
 .message-input {
     flex: 1;
+
     border: 1px solid #ddd;
     border-radius: 25px;
+
     padding: 12px 16px;
+
     outline: none;
+
     font-size: 15px;
 }
 
 .send {
     width: 50px;
     height: 45px;
+
     border: none;
     border-radius: 50%;
+
     background: #ff4f81;
     color: white;
+
     font-size: 18px;
+
     cursor: pointer;
 }
 
@@ -167,8 +186,8 @@ body {
 <!-- CHAT -->
 
 <div
-    class="chat"
     id="chat"
+    class="chat"
 >
 </div>
 
@@ -187,8 +206,8 @@ body {
         >
 
         <button
+            id="sendButton"
             class="send"
-            onclick="sendMessage()"
         >
 
             ➤
@@ -203,7 +222,9 @@ body {
 <script>
 
 
-/* SUPABASE */
+/* =========================
+   SUPABASE
+========================= */
 
 const SUPABASE_URL =
     "https://aodkljvskeuumrqesynm.supabase.co";
@@ -213,82 +234,91 @@ const SUPABASE_KEY =
     "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
 
 
-/* LOAD MESSAGES */
+const supabaseClient =
+    window.supabase.createClient(
+
+        SUPABASE_URL,
+
+        SUPABASE_KEY
+
+    );
+
+
+/* =========================
+   LOAD OLD MESSAGES
+========================= */
 
 async function loadMessages() {
 
-    try {
+    const { data, error } =
+        await supabaseClient
 
-        const response = await fetch(
+        .from("Message")
 
-            SUPABASE_URL +
-            "/rest/v1/Message" +
+        .select("*")
 
-            "?or=(and(sender.eq.Vincent,receiver.eq.Amy),and(sender.eq.Amy,receiver.eq.Vincent))" +
+        .or(
+            "and(sender.eq.Vincent,receiver.eq.Amy),and(sender.eq.Amy,receiver.eq.Vincent)"
+        )
 
-            "&select=*" +
-
-            "&order=created_at.asc",
-
+        .order(
+            "created_at",
             {
-
-                headers: {
-
-                    "apikey":
-                        SUPABASE_KEY,
-
-                    "Authorization":
-                        "Bearer " +
-                        SUPABASE_KEY
-
-                }
-
+                ascending: true
             }
-
         );
 
 
-        const messages =
-            await response.json();
+    if (error) {
 
+        console.error(
+            "Load messages error:",
+            error
+        );
 
-        const chat =
-            document.getElementById("chat");
-
-
-        chat.innerHTML = "";
-
-
-        messages.forEach(function(item) {
-
-            displayMessage(item);
-
-        });
+        return;
 
     }
 
-    catch (error) {
 
-        console.error(error);
+    const chat =
+        document.getElementById(
+            "chat"
+        );
 
-    }
+
+    chat.innerHTML = "";
+
+
+    data.forEach(
+        displayMessage
+    );
 
 }
 
 
-/* DISPLAY MESSAGE */
+/* =========================
+   DISPLAY MESSAGE
+========================= */
 
 function displayMessage(item) {
 
     const chat =
-        document.getElementById("chat");
+        document.getElementById(
+            "chat"
+        );
 
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
-    if (item.sender === "Amy") {
+    if (
+        item.sender ===
+        "Amy"
+    ) {
 
         div.className =
             "message host-message";
@@ -304,19 +334,20 @@ function displayMessage(item) {
 
 
     const time =
-        new Date(item.created_at)
-            .toLocaleTimeString([], {
-
+        new Date(
+            item.created_at
+        ).toLocaleTimeString(
+            [],
+            {
                 hour: "2-digit",
-
                 minute: "2-digit"
-
-            });
+            }
+        );
 
 
     div.innerHTML = `
 
-        ${item.message}
+        ${escapeHtml(item.message)}
 
         <div class="time">
 
@@ -330,20 +361,34 @@ function displayMessage(item) {
     chat.appendChild(div);
 
 
-    window.scrollTo({
-
-        top:
-            document.body.scrollHeight,
-
-        behavior:
-            "smooth"
-
-    });
+    chat.scrollTop =
+        chat.scrollHeight;
 
 }
 
 
-/* SEND MESSAGE */
+/* =========================
+   ESCAPE HTML
+========================= */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+
+/* =========================
+   SEND MESSAGE
+========================= */
 
 async function sendMessage() {
 
@@ -360,180 +405,88 @@ async function sendMessage() {
     if (!message) return;
 
 
-    try {
+    input.disabled = true;
 
-        const response = await fetch(
 
-            SUPABASE_URL +
-            "/rest/v1/Message",
+    const { error } =
+        await supabaseClient
 
-            {
+        .from("Message")
 
-                method: "POST",
+        .insert({
 
-                headers: {
+            sender: "Amy",
 
-                    "Content-Type":
-                        "application/json",
+            receiver: "Vincent",
 
-                    "apikey":
-                        SUPABASE_KEY,
+            message: message
 
-                    "Authorization":
-                        "Bearer " +
-                        SUPABASE_KEY,
+        });
 
-                    "Prefer":
-                        "return=minimal"
 
-                },
+    input.disabled = false;
 
-                body: JSON.stringify({
 
-                    sender: "Amy",
+    if (error) {
 
-                    receiver: "Vincent",
-
-                    message: message
-
-                })
-
-            }
-
+        console.error(
+            "Send message error:",
+            error
         );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Message could not be sent"
-            );
-
-        }
-
-
-        input.value = "";
-
-    }
-
-    catch (error) {
-
-        console.error(error);
 
         alert(
             "Message could not be sent."
         );
 
+        return;
+
     }
+
+
+    input.value = "";
 
 }
 
 
-/* REALTIME */
+/* =========================
+   REALTIME
+========================= */
 
 const channel =
-    new WebSocket(
+    supabaseClient
 
-        "wss://aodkljvskeuumrqesynm.supabase.co/realtime/v1/websocket?apikey=" +
-        encodeURIComponent(
-            SUPABASE_KEY
-        ) +
-        "&vsn=1.0.0"
+    .channel(
+        "love-demo-host-chat"
+    )
 
-    );
+    .on(
 
+        "postgres_changes",
 
-channel.onopen = function() {
+        {
 
-    console.log(
-        "Host realtime connected"
-    );
+            event: "INSERT",
 
+            schema: "public",
 
-    channel.send(
+            table: "Message"
 
-        JSON.stringify({
+        },
 
-            topic:
-                "realtime:public:Message",
+        function(payload) {
 
-            event:
-                "phx_join",
-
-            payload: {
-
-                config: {
-
-                    broadcast: {
-
-                        self: false
-
-                    },
-
-                    presence: {
-
-                        key: ""
-
-                    },
-
-                    postgres_changes: [
-
-                        {
-
-                            event:
-                                "INSERT",
-
-                            schema:
-                                "public",
-
-                            table:
-                                "Message"
-
-                        }
-
-                    ]
-
-                }
-
-            },
-
-            ref:
-                "1"
-
-        })
-
-    );
-
-};
+            const message =
+                payload.new;
 
 
-channel.onmessage = function(event) {
-
-    try {
-
-        const data =
-            JSON.parse(
-                event.data
-            );
-
-
-        if (
-            data.event ===
-            "postgres_changes"
-        ) {
-
-            const record =
-                data.payload.record;
-
-
-            if (
+            const isCurrentChat =
 
                 (
 
-                    record.sender ===
+                    message.sender ===
                     "Vincent" &&
 
-                    record.receiver ===
+                    message.receiver ===
                     "Amy"
 
                 )
@@ -542,43 +495,44 @@ channel.onmessage = function(event) {
 
                 (
 
-                    record.sender ===
+                    message.sender ===
                     "Amy" &&
 
-                    record.receiver ===
+                    message.receiver ===
                     "Vincent"
 
-                )
+                );
 
+
+            if (
+                isCurrentChat
             ) {
 
                 displayMessage(
-                    record
+                    message
                 );
 
             }
 
         }
 
-    }
+    )
 
-    catch (error) {
+    .subscribe(
+        function(status) {
 
-        console.error(
-            error
-        );
+            console.log(
+                "Host realtime status:",
+                status
+            );
 
-    }
-
-};
-
-
-/* LOAD OLD MESSAGES */
-
-loadMessages();
+        }
+    );
 
 
-/* ENTER TO SEND */
+/* =========================
+   ENTER TO SEND
+========================= */
 
 document.getElementById(
     "messageInput"
@@ -599,6 +553,25 @@ document.getElementById(
     }
 );
 
+
+/* =========================
+   SEND BUTTON
+========================= */
+
+document.getElementById(
+    "sendButton"
+)
+.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+/* =========================
+   START
+========================= */
+
+loadMessages();
 
 </script>
 
