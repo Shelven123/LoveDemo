@@ -3,577 +3,642 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>LoveDemo Host Chat</title>
+    <title>LoveDemo Host Chat</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
+    <style>
 
-* {
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f5f7;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
 
-.header {
-    height: 65px;
-    background: white;
-    border-bottom: 1px solid #eee;
+        .header {
+            height: 65px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    display: flex;
-    align-items: center;
+        .back {
+            font-size: 25px;
+            cursor: pointer;
+            margin-right: 12px;
+        }
 
-    padding: 0 15px;
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
 
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+        .host-info {
+            flex: 1;
+        }
 
-    z-index: 10;
-}
+        .host-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-.host-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-}
+        .online {
+            font-size: 12px;
+            color: #22c55e;
+            margin-top: 3px;
+        }
 
-.host-info {
-    margin-left: 10px;
-}
+        .earnings {
+            background: #fff4cc;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #d97706;
+        }
 
-.host-name {
-    font-size: 17px;
-    font-weight: bold;
-}
+        .chat-area {
+            padding: 15px;
+            padding-bottom: 80px;
+            min-height: calc(100vh - 65px);
+        }
 
-.online {
-    color: #22c55e;
-    font-size: 12px;
-    margin-top: 3px;
-}
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
 
-.chat {
-    padding: 85px 15px 90px;
-    max-width: 700px;
-    margin: auto;
-}
+        .mine {
+            margin-left: auto;
+            background: #ff4f81;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
 
-.message {
-    max-width: 75%;
-    padding: 11px 14px;
-    border-radius: 18px;
-    margin-bottom: 12px;
-    font-size: 15px;
-    line-height: 1.4;
-    word-wrap: break-word;
-}
+        .theirs {
+            margin-right: auto;
+            background: white;
+            color: #222;
+            border-bottom-left-radius: 5px;
+        }
 
-.host-message {
-    background: #ff4f81;
-    color: white;
-    margin-left: auto;
-    border-bottom-right-radius: 5px;
-}
+        .empty {
+            text-align: center;
+            color: #999;
+            margin-top: 100px;
+        }
 
-.user-message {
-    background: white;
-    color: #222;
-    margin-right: auto;
-    border-bottom-left-radius: 5px;
-}
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+        }
 
-.time {
-    font-size: 10px;
-    opacity: 0.6;
-    margin-top: 4px;
-}
+        .input-area input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 22px;
+            padding: 11px 15px;
+            outline: none;
+            font-size: 15px;
+        }
 
-.input-area {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+        .send-button {
+            border: none;
+            background: #ff4f81;
+            color: white;
+            border-radius: 22px;
+            padding: 0 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-    background: white;
-    border-top: 1px solid #eee;
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
 
-    padding: 10px;
-}
-
-.input-box {
-    max-width: 700px;
-    margin: auto;
-
-    display: flex;
-    gap: 8px;
-}
-
-.message-input {
-    flex: 1;
-
-    border: 1px solid #ddd;
-    border-radius: 25px;
-
-    padding: 12px 16px;
-
-    outline: none;
-
-    font-size: 15px;
-}
-
-.send {
-    width: 50px;
-    height: 45px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #ff4f81;
-    color: white;
-
-    font-size: 18px;
-
-    cursor: pointer;
-}
-
-</style>
+    </style>
 
 </head>
+
 
 <body>
 
 
-<!-- HEADER -->
+    <div class="header">
 
-<div class="header">
+        <div
+            class="back"
+            onclick="history.back()"
+        >
+            ‹
+        </div>
 
-    <img
-        class="host-avatar"
-        src="https://i.pravatar.cc/200?img=47"
-    >
 
-    <div class="host-info">
+        <img
+            id="hostAvatar"
+            class="avatar"
+            src="https://i.pravatar.cc/200?img=47"
+        >
 
-        <div class="host-name">
 
-            Amy
+        <div class="host-info">
+
+            <div class="host-name">
+                Amy
+            </div>
+
+            <div class="online">
+                🟢 Online
+            </div>
 
         </div>
 
-        <div class="online">
 
-            🟢 Host Online
-
+        <div
+            id="earnings"
+            class="earnings"
+        >
+            💎 0
         </div>
 
     </div>
 
-</div>
+
+    <div
+        id="chatArea"
+        class="chat-area"
+    >
+
+        <div
+            id="emptyMessage"
+            class="empty"
+        >
+            No messages yet
+        </div>
+
+    </div>
 
 
-<!-- CHAT -->
-
-<div
-    id="chat"
-    class="chat"
->
-</div>
-
-
-<!-- INPUT -->
-
-<div class="input-area">
-
-    <div class="input-box">
+    <div class="input-area">
 
         <input
             id="messageInput"
-            class="message-input"
             type="text"
             placeholder="Reply to Vincent..."
+            autocomplete="off"
         >
 
         <button
             id="sendButton"
-            class="send"
+            class="send-button"
+            onclick="sendMessage()"
         >
-
-            ➤
-
+            Send
         </button>
 
     </div>
-
-</div>
 
 
 <script>
 
 
-/* =========================
-   SUPABASE
-========================= */
+    // ==============================
+    // SUPABASE
+    // ==============================
 
-const SUPABASE_URL =
-    "https://aodkljvskeuumrqesynm.supabase.co";
-
-
-const SUPABASE_KEY =
-    "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+    const SUPABASE_URL =
+        "https://aodkljvskeuumrqesynm.supabase.co";
 
 
-const supabaseClient =
-    window.supabase.createClient(
-
-        SUPABASE_URL,
-
-        SUPABASE_KEY
-
-    );
+    const SUPABASE_KEY =
+        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
 
 
-/* =========================
-   LOAD OLD MESSAGES
-========================= */
-
-async function loadMessages() {
-
-    const { data, error } =
-        await supabaseClient
-
-        .from("Message")
-
-        .select("*")
-
-        .or(
-            "and(sender.eq.Vincent,receiver.eq.Amy),and(sender.eq.Amy,receiver.eq.Vincent)"
-        )
-
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
         );
 
 
-    if (error) {
+    // ==============================
+    // USERS
+    // ==============================
 
-        console.error(
-            "Load messages error:",
-            error
+    const currentUser =
+        "Amy";
+
+
+    const customer =
+        "Vincent";
+
+
+    // ==============================
+    // DISPLAY MESSAGE
+    // ==============================
+
+    function displayMessage(message) {
+
+        const chatArea =
+            document.getElementById(
+                "chatArea"
+            );
+
+
+        const empty =
+            document.getElementById(
+                "emptyMessage"
+            );
+
+
+        if (empty) {
+
+            empty.remove();
+
+        }
+
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.classList.add(
+            "message"
         );
 
-        return;
+
+        if (
+            message.sender ===
+            currentUser
+        ) {
+
+            div.classList.add(
+                "mine"
+            );
+
+        } else {
+
+            div.classList.add(
+                "theirs"
+            );
+
+        }
+
+
+        div.textContent =
+            message.message;
+
+
+        chatArea.appendChild(
+            div
+        );
+
+
+        chatArea.scrollTop =
+            chatArea.scrollHeight;
 
     }
 
 
-    const chat =
-        document.getElementById(
-            "chat"
-        );
+    // ==============================
+    // LOAD OLD MESSAGES
+    // ==============================
 
+    async function loadMessages() {
 
-    chat.innerHTML = "";
+        const { data, error } =
+            await supabaseClient
+            .from("Message")
+            .select("*")
+            .or(
+                `and(sender.eq.${currentUser},receiver.eq.${customer}),and(sender.eq.${customer},receiver.eq.${currentUser})`
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
+            );
 
 
-    data.forEach(
-        displayMessage
-    );
+        if (error) {
 
-}
+            console.error(
+                "Load messages error:",
+                error
+            );
 
+            return;
 
-/* =========================
-   DISPLAY MESSAGE
-========================= */
+        }
 
-function displayMessage(item) {
 
-    const chat =
-        document.getElementById(
-            "chat"
-        );
-
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    if (
-        item.sender ===
-        "Amy"
-    ) {
-
-        div.className =
-            "message host-message";
-
-    }
-
-    else {
-
-        div.className =
-            "message user-message";
-
-    }
-
-
-    const time =
-        new Date(
-            item.created_at
-        ).toLocaleTimeString(
-            [],
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
-
-
-    div.innerHTML = `
-
-        ${escapeHtml(item.message)}
-
-        <div class="time">
-
-            ${time}
-
-        </div>
-
-    `;
-
-
-    chat.appendChild(div);
-
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
-}
-
-
-/* =========================
-   ESCAPE HTML
-========================= */
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.textContent =
-        text;
-
-    return div.innerHTML;
-
-}
-
-
-/* =========================
-   SEND MESSAGE
-========================= */
-
-async function sendMessage() {
-
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
-
-
-    const message =
-        input.value.trim();
-
-
-    if (!message) return;
-
-
-    input.disabled = true;
-
-
-    const { error } =
-        await supabaseClient
-
-        .from("Message")
-
-        .insert({
-
-            sender: "Amy",
-
-            receiver: "Vincent",
-
-            message: message
-
-        });
-
-
-    input.disabled = false;
-
-
-    if (error) {
-
-        console.error(
-            "Send message error:",
-            error
-        );
-
-        alert(
-            "Message could not be sent."
-        );
-
-        return;
-
-    }
-
-
-    input.value = "";
-
-}
-
-
-/* =========================
-   REALTIME
-========================= */
-
-const channel =
-    supabaseClient
-
-    .channel(
-        "love-demo-host-chat"
-    )
-
-    .on(
-
-        "postgres_changes",
-
-        {
-
-            event: "INSERT",
-
-            schema: "public",
-
-            table: "Message"
-
-        },
-
-        function(payload) {
-
-            const message =
-                payload.new;
-
-
-            const isCurrentChat =
-
-                (
-
-                    message.sender ===
-                    "Vincent" &&
-
-                    message.receiver ===
-                    "Amy"
-
-                )
-
-                ||
-
-                (
-
-                    message.sender ===
-                    "Amy" &&
-
-                    message.receiver ===
-                    "Vincent"
-
-                );
-
-
-            if (
-                isCurrentChat
-            ) {
+        data.forEach(
+            function(message) {
 
                 displayMessage(
                     message
                 );
 
             }
-
-        }
-
-    )
-
-    .subscribe(
-        function(status) {
-
-            console.log(
-                "Host realtime status:",
-                status
-            );
-
-        }
-    );
-
-
-/* =========================
-   ENTER TO SEND
-========================= */
-
-document.getElementById(
-    "messageInput"
-)
-.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key ===
-            "Enter"
-        ) {
-
-            sendMessage();
-
-        }
+        );
 
     }
-);
 
 
-/* =========================
-   SEND BUTTON
-========================= */
+    // ==============================
+    // LOAD AMY DIAMONDS
+    // ==============================
 
-document.getElementById(
-    "sendButton"
-)
-.addEventListener(
-    "click",
-    sendMessage
-);
+    async function loadEarnings() {
+
+        const { data, error } =
+            await supabaseClient
+            .from("Profile")
+            .select("diamonds")
+            .ilike(
+                "username",
+                currentUser
+            )
+            .single();
 
 
-/* =========================
-   START
-========================= */
+        if (error) {
 
-loadMessages();
+            console.error(
+                "Load earnings error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        updateEarnings(
+            data.diamonds
+        );
+
+    }
+
+
+    // ==============================
+    // UPDATE EARNINGS
+    // ==============================
+
+    function updateEarnings(
+        amount
+    ) {
+
+        document.getElementById(
+            "earnings"
+        ).textContent =
+            "💎 " +
+            Number(
+                amount
+            ).toLocaleString();
+
+    }
+
+
+    // ==============================
+    // SEND REPLY
+    // ==============================
+
+    async function sendMessage() {
+
+        const input =
+            document.getElementById(
+                "messageInput"
+            );
+
+
+        const button =
+            document.getElementById(
+                "sendButton"
+            );
+
+
+        const message =
+            input.value.trim();
+
+
+        if (!message) {
+
+            return;
+
+        }
+
+
+        button.disabled = true;
+
+        input.disabled = true;
+
+
+        // ==========================
+        // HOST REPLY
+        // ==========================
+
+        const { data, error } =
+            await supabaseClient
+            .from("Message")
+            .insert({
+                sender:
+                    currentUser,
+
+                receiver:
+                    customer,
+
+                message:
+                    message
+            });
+
+
+        if (error) {
+
+            console.error(
+                "Send message error:",
+                error
+            );
+
+
+            alert(
+                "Message failed to send."
+            );
+
+
+            button.disabled = false;
+
+            input.disabled = false;
+
+            return;
+
+        }
+
+
+        input.value = "";
+
+
+        button.disabled = false;
+
+        input.disabled = false;
+
+        input.focus();
+
+    }
+
+
+    // ==============================
+    // REALTIME
+    // ==============================
+
+    const channel =
+        supabaseClient
+        .channel(
+            "love-demo-host-chat"
+        )
+        .on(
+            "postgres_changes",
+            {
+                event:
+                    "INSERT",
+
+                schema:
+                    "public",
+
+                table:
+                    "Message"
+            },
+
+            function(payload) {
+
+                const message =
+                    payload.new;
+
+
+                const isCurrentChat =
+                    (
+                        message.sender ===
+                        currentUser &&
+                        message.receiver ===
+                        customer
+                    )
+                    ||
+                    (
+                        message.sender ===
+                        customer &&
+                        message.receiver ===
+                        currentUser
+                    );
+
+
+                if (
+                    isCurrentChat
+                ) {
+
+                    displayMessage(
+                        message
+                    );
+
+                }
+
+
+                // 当 Vincent 发消息时
+                // 重新读取 Amy Diamond
+
+                if (
+                    message.sender ===
+                    customer &&
+                    message.receiver ===
+                    currentUser
+                ) {
+
+                    loadEarnings();
+
+                }
+
+            }
+        )
+        .subscribe(
+            function(status) {
+
+                console.log(
+                    "Host realtime status:",
+                    status
+                );
+
+            }
+        );
+
+
+    // ==============================
+    // ENTER KEY
+    // ==============================
+
+    document
+        .getElementById(
+            "messageInput"
+        )
+        .addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    sendMessage();
+
+                }
+
+            }
+        );
+
+
+    // ==============================
+    // START
+    // ==============================
+
+    loadMessages();
+
+    loadEarnings();
+
 
 </script>
+
 
 </body>
 
