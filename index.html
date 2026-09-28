@@ -1,163 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>LoveDemo</title>
+<meta charset="UTF-8">
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        header {
-            background: #ff4f81;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
+<title>LoveDemo</title>
 
-        .container {
-            max-width: 500px;
-            margin: 30px auto;
-            padding: 20px;
-        }
+<style>
 
-        .title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7f9;
+    color: #222;
+}
 
-        .avatar {
-            width: 120px;
-            height: 120px;
-            background: #ffd6e3;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 55px;
-            margin: auto;
-        }
+/* HEADER */
 
-        .name {
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
+.header {
+    background: white;
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
 
-        .bio {
-            text-align: center;
-            color: #666;
-            margin: 12px 0 20px;
-            line-height: 1.5;
-        }
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ff4f81;
+}
 
-        .diamonds {
-            text-align: center;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
+.diamond {
+    background: #fff0f5;
+    color: #ff4f81;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
 
-        button {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background: #ff4f81;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
+/* MAIN */
 
-        button:hover {
-            background: #e63e6d;
-        }
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 25px 20px 90px;
+}
 
-        .back {
-            background: #888;
-            margin-top: 10px;
-        }
+.title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
 
-        .back:hover {
-            background: #666;
-        }
+.subtitle {
+    color: #888;
+    margin-bottom: 20px;
+}
 
-        #profilePage {
-            display: none;
-        }
-    </style>
+/* SEARCH */
+
+.search {
+    width: 100%;
+    padding: 14px 18px;
+    border: none;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+/* HOST GRID */
+
+.hosts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+/* HOST CARD */
+
+.card {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+    transition: 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.avatar-box {
+    position: relative;
+    width: 100%;
+    height: 230px;
+    background: #eee;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.online {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: #21c55d;
+    color: white;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.info {
+    padding: 15px;
+}
+
+.name {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.bio {
+    color: #777;
+    font-size: 14px;
+    min-height: 40px;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.chat-button {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background: #ff4f81;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.chat-button:hover {
+    background: #e63e6d;
+}
+
+/* EMPTY */
+
+.empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: #888;
+}
+
+/* BOTTOM NAV */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 20;
+}
+
+.nav-item {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    cursor: pointer;
+}
+
+.nav-item.active {
+    color: #ff4f81;
+    font-weight: bold;
+}
+
+.nav-icon {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 3px;
+}
+
+/* DESKTOP */
+
+@media (min-width: 700px) {
+
+    .hosts {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .avatar-box {
+        height: 260px;
+    }
+
+}
+
+</style>
+
 </head>
+
 
 <body>
 
-<header>
-    ❤️ LoveDemo
-</header>
 
+<!-- HEADER -->
+
+<div class="header">
+
+    <div class="logo">
+        ❤️ LoveDemo
+    </div>
+
+    <div class="diamond">
+        💎 10,000
+    </div>
+
+</div>
+
+
+<!-- MAIN -->
 
 <div class="container">
 
-    <!-- HOST LIST -->
+    <div class="title">
+        Discover Hosts
+    </div>
 
-    <div id="hostList">
-
-        <div class="title">
-            Discover Hosts
-        </div>
-
-        <div id="hosts">
-            Loading hosts...
-        </div>
-
+    <div class="subtitle">
+        Meet new people and start chatting ❤️
     </div>
 
 
-    <!-- AMY PROFILE -->
+    <!-- SEARCH -->
 
-    <div id="profilePage">
+    <input
+        class="search"
+        id="search"
+        type="text"
+        placeholder="🔍 Search hosts..."
+    >
 
-        <div class="card">
 
-            <div class="avatar">
-                👩
-            </div>
+    <!-- HOSTS -->
 
-            <div class="name" id="profileName">
-                Amy
-            </div>
+    <div
+        class="hosts"
+        id="hosts"
+    >
 
-            <div class="bio" id="profileBio">
-                Friendly and love chatting 😊
-            </div>
-
-            <div class="diamonds">
-                💎 <span id="profileDiamonds">0</span> Diamonds
-            </div>
-
-            <button onclick="startChat()">
-                💬 Chat with Amy
-            </button>
-
-            <button class="back" onclick="goBack()">
-                ← Back
-            </button>
-
+        <div class="empty">
+            Loading hosts...
         </div>
 
     </div>
@@ -165,140 +281,305 @@
 </div>
 
 
+<!-- BOTTOM NAV -->
+
+<div class="bottom-nav">
+
+    <div class="nav-item active">
+
+        <span class="nav-icon">🏠</span>
+
+        Home
+
+    </div>
+
+
+    <div class="nav-item">
+
+        <span class="nav-icon">💬</span>
+
+        Chats
+
+    </div>
+
+
+    <div class="nav-item">
+
+        <span class="nav-icon">💎</span>
+
+        Wallet
+
+    </div>
+
+
+    <div class="nav-item">
+
+        <span class="nav-icon">👤</span>
+
+        Me
+
+    </div>
+
+</div>
+
+
+
 <script>
 
-    const SUPABASE_URL =
-        "https://aodkljvskeuumrqesynm.supabase.co";
 
-    const SUPABASE_KEY =
-        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+/* SUPABASE */
 
-
-    let selectedHost = null;
+const SUPABASE_URL =
+    "https://aodkljvskeuumrqesynm.supabase.co";
 
 
-    async function loadHosts() {
+const SUPABASE_KEY =
+    "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+
+
+let allHosts = [];
+
+
+/* LOAD HOSTS */
+
+async function loadHosts() {
+
+    const container =
+        document.getElementById("hosts");
+
+
+    try {
 
         const response = await fetch(
+
             `${SUPABASE_URL}/rest/v1/Profile?role=eq.host&select=*`,
+
             {
+
                 headers: {
+
                     "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${SUPABASE_KEY}`
+
+                    "Authorization":
+                        `Bearer ${SUPABASE_KEY}`
+
                 }
+
             }
+
         );
 
 
-        const hosts = await response.json();
+        if (!response.ok) {
+
+            throw new Error(
+                "Supabase request failed"
+            );
+
+        }
 
 
-        const container =
-            document.getElementById("hosts");
+        const hosts =
+            await response.json();
 
 
-        container.innerHTML = "";
+        allHosts = hosts;
 
 
-        hosts.forEach(host => {
-
-            const card =
-                document.createElement("div");
-
-            card.className = "card";
+        displayHosts(hosts);
 
 
-            card.innerHTML = `
+    } catch (error) {
 
-                <div class="avatar">
-                    👩
+        console.error(error);
+
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                ❌ Unable to load hosts.
+
+                <br><br>
+
+                Please check your Supabase connection.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+
+/* DISPLAY HOSTS */
+
+function displayHosts(hosts) {
+
+    const container =
+        document.getElementById("hosts");
+
+
+    container.innerHTML = "";
+
+
+    if (hosts.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                No hosts found.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    hosts.forEach(host => {
+
+
+        const card =
+            document.createElement("div");
+
+
+        card.className = "card";
+
+
+        const avatar =
+
+            host.avatar_url &&
+
+            host.avatar_url.trim() !== ""
+
+            ? host.avatar_url
+
+            : "https://i.pravatar.cc/500?img=47";
+
+
+        card.innerHTML = `
+
+            <div class="avatar-box">
+
+                <img
+                    class="avatar"
+                    src="${avatar}"
+                    alt="${host.username}"
+                    onerror="this.src='https://i.pravatar.cc/500?img=47'"
+                >
+
+                <div class="online">
+
+                    🟢 Online
+
                 </div>
+
+            </div>
+
+
+            <div class="info">
 
                 <div class="name">
+
                     ${host.username}
+
                 </div>
+
 
                 <div class="bio">
-                    ${host.bio || ""}
+
+                    ${host.bio || "Let's chat ❤️"}
+
                 </div>
 
-                <button>
-                    View Profile
+
+                <button
+                    class="chat-button"
+                    onclick="openHost('${host.id}')"
+                >
+
+                    💬 Chat
+
                 </button>
 
-            `;
+            </div>
+
+        `;
 
 
-            card.querySelector("button")
-                .addEventListener("click", function() {
+        container.appendChild(card);
 
-                    openProfile(host);
+    });
 
-                });
-
-
-            container.appendChild(card);
-
-        });
-
-    }
+}
 
 
-    function openProfile(host) {
 
-        selectedHost = host;
+/* OPEN HOST */
 
+function openHost(hostId) {
 
-        document.getElementById("hostList")
-            .style.display = "none";
-
-
-        document.getElementById("profilePage")
-            .style.display = "block";
-
-
-        document.getElementById("profileName")
-            .textContent = host.username;
-
-
-        document.getElementById("profileBio")
-            .textContent =
-                host.bio || "";
-
-
-        document.getElementById("profileDiamonds")
-            .textContent =
-                host.diamonds || 0;
-
-    }
-
-
-    function goBack() {
-
-        document.getElementById("profilePage")
-            .style.display = "none";
-
-
-        document.getElementById("hostList")
-            .style.display = "block";
-
-    }
-
-
-    function startChat() {
-
-        alert(
-            "Chat with " +
-            selectedHost.username +
-            " ❤️"
+    const host =
+        allHosts.find(
+            item => item.id === hostId
         );
 
-    }
+
+    if (!host) return;
 
 
-    loadHosts();
+    alert(
+
+        "Opening chat with " +
+        host.username +
+        " ❤️"
+
+    );
+
+}
+
+
+
+/* SEARCH */
+
+document
+    .getElementById("search")
+    .addEventListener("input", function() {
+
+        const keyword =
+            this.value.toLowerCase();
+
+
+        const filtered =
+            allHosts.filter(host =>
+
+                host.username
+                    .toLowerCase()
+                    .includes(keyword)
+
+            );
+
+
+        displayHosts(filtered);
+
+    });
+
+
+
+/* START */
+
+loadHosts();
+
 
 </script>
 
+
 </body>
+
 </html>
