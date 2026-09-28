@@ -530,17 +530,18 @@ function openHost(hostId) {
             item => item.id === hostId
         );
 
-
     if (!host) return;
 
+    const params =
+        new URLSearchParams({
+            id: host.id,
+            name: host.username,
+            bio: host.bio || "",
+            avatar: host.avatar_url || ""
+        });
 
-    alert(
-
-        "Opening chat with " +
-        host.username +
-        " ❤️"
-
-    );
+    window.location.href =
+        "chat.html?" + params.toString();
 
 }
 
