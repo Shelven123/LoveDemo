@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LoveDemo Wallet</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            height: 65px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .back {
+            font-size: 28px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .title {
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        .wallet {
+            padding: 25px 18px;
+        }
+
+        .balance-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+        }
+
+        .balance-title {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .balance {
+            font-size: 38px;
+            font-weight: bold;
+            color: #d97706;
+        }
+
+        .diamond {
+            font-size: 30px;
+        }
+
+        .section-title {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .packages {
+            display: grid;
+            gap: 12px;
+        }
+
+        .package {
+            background: white;
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .package-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .package-icon {
+            font-size: 28px;
+            margin-right: 12px;
+        }
+
+        .package-diamonds {
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .package-label {
+            font-size: 12px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .add-button {
+            border: none;
+            background: #ff4f81;
+            color: white;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .add-button:disabled {
+            background: #ccc;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #22c55e;
+            min-height: 20px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="header">
+
+        <div
+            class="back"
+            onclick="history.back()"
+        >
+            ‹
+        </div>
+
+        <div class="title">
+            Wallet
+        </div>
+
+    </div>
+
+
+    <div class="wallet">
+
+
+        <div class="balance-card">
+
+            <div class="balance-title">
+                Your Diamond Balance
+            </div>
+
+            <div
+                id="balance"
+                class="balance"
+            >
+                <span class="diamond">💎</span>
+                0
+            </div>
+
+        </div>
+
+
+        <div class="section-title">
+            Recharge Diamonds
+        </div>
+
+
+        <div class="packages">
+
+
+            <div class="package">
+
+                <div class="package-left">
+
+                    <div class="package-icon">
+                        💎
+                    </div>
+
+                    <div>
+
+                        <div class="package-diamonds">
+                            1,000 Diamonds
+                        </div>
+
+                        <div class="package-label">
+                            Demo Recharge
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="add-button"
+                    onclick="addDiamonds(1000)"
+                >
+                    + 1,000
+                </button>
+
+            </div>
+
+
+            <div class="package">
+
+                <div class="package-left">
+
+                    <div class="package-icon">
+                        💎
+                    </div>
+
+                    <div>
+
+                        <div class="package-diamonds">
+                            5,000 Diamonds
+                        </div>
+
+                        <div class="package-label">
+                            Demo Recharge
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="add-button"
+                    onclick="addDiamonds(5000)"
+                >
+                    + 5,000
+                </button>
+
+            </div>
+
+
+            <div class="package">
+
+                <div class="package-left">
+
+                    <div class="package-icon">
+                        💎
+                    </div>
+
+                    <div>
+
+                        <div class="package-diamonds">
+                            10,000 Diamonds
+                        </div>
+
+                        <div class="package-label">
+                            Demo Recharge
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    class="add-button"
+                    onclick="addDiamonds(10000)"
+                >
+                    + 10,000
+                </button>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="message"
+            class="message"
+        ></div>
+
+
+    </div>
+
+
+<script>
+
+
+    // ==============================
+    // SUPABASE
+    // ==============================
+
+    const SUPABASE_URL =
+        "https://aodkljvskeuumrqesynm.supabase.co";
+
+
+    const SUPABASE_KEY =
+        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+    // ==============================
+    // CURRENT USER
+    // ==============================
+
+    const currentUser =
+        "vincent";
+
+
+    // ==============================
+    // LOAD BALANCE
+    // ==============================
+
+    async function loadBalance() {
+
+        const { data, error } =
+            await supabaseClient
+            .from("Profile")
+            .select("diamonds")
+            .ilike(
+                "username",
+                currentUser
+            )
+            .single();
+
+
+        if (error) {
+
+            console.error(
+                "Balance error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        updateBalance(
+            data.diamonds
+        );
+
+    }
+
+
+    // ==============================
+    // UPDATE BALANCE
+    // ==============================
+
+    function updateBalance(
+        amount
+    ) {
+
+        document.getElementById(
+            "balance"
+        ).innerHTML =
+            '<span class="diamond">💎</span> ' +
+            Number(
+                amount
+            ).toLocaleString();
+
+    }
+
+
+    // ==============================
+    // DEMO RECHARGE
+    // ==============================
+
+    async function addDiamonds(
+        amount
+    ) {
+
+        const buttons =
+            document.querySelectorAll(
+                ".add-button"
+            );
+
+
+        buttons.forEach(
+            function(button) {
+
+                button.disabled = true;
+
+            }
+        );
+
+
+        const { data, error } =
+            await supabaseClient
+            .from("Profile")
+            .select("diamonds")
+            .ilike(
+                "username",
+                currentUser
+            )
+            .single();
+
+
+        if (error) {
+
+            alert(
+                "Unable to load balance."
+            );
+
+            enableButtons();
+
+            return;
+
+        }
+
+
+        const newBalance =
+            Number(data.diamonds) +
+            Number(amount);
+
+
+        const { error: updateError } =
+            await supabaseClient
+            .from("Profile")
+            .update({
+                diamonds:
+                    newBalance
+            })
+            .ilike(
+                "username",
+                currentUser
+            );
+
+
+        if (updateError) {
+
+            console.error(
+                updateError
+            );
+
+            alert(
+                "Recharge failed."
+            );
+
+            enableButtons();
+
+            return;
+
+        }
+
+
+        updateBalance(
+            newBalance
+        );
+
+
+        document.getElementById(
+            "message"
+        ).textContent =
+            "Successfully added 💎 " +
+            Number(amount).toLocaleString();
+
+
+        enableButtons();
+
+    }
+
+
+    // ==============================
+    // ENABLE BUTTONS
+    // ==============================
+
+    function enableButtons() {
+
+        const buttons =
+            document.querySelectorAll(
+                ".add-button"
+            );
+
+
+        buttons.forEach(
+            function(button) {
+
+                button.disabled = false;
+
+            }
+        );
+
+    }
+
+
+    // ==============================
+    // START
+    // ==============================
+
+    loadBalance();
+
+
+</script>
+
+
+</body>
+
+</html>
