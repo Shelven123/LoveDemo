@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LoveDemo Register</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff4f81;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #ff4f81;
+        }
+
+        .register-button {
+            width: 100%;
+            border: none;
+            background: #ff4f81;
+            color: white;
+            padding: 13px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .register-button:disabled {
+            background: #ccc;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #ff4f81;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+    <div class="logo">
+        ❤️ LoveDemo
+    </div>
+
+
+    <div class="subtitle">
+        Create your account
+    </div>
+
+
+    <label>
+        Username
+    </label>
+
+    <input
+        id="username"
+        type="text"
+        placeholder="Enter username"
+        autocomplete="username"
+    >
+
+
+    <label>
+        Email
+    </label>
+
+    <input
+        id="email"
+        type="email"
+        placeholder="Enter email"
+        autocomplete="email"
+    >
+
+
+    <label>
+        Password
+    </label>
+
+    <input
+        id="password"
+        type="password"
+        placeholder="At least 6 characters"
+        autocomplete="new-password"
+    >
+
+
+    <label>
+        Account Type
+    </label>
+
+    <select id="role">
+
+        <option value="user">
+            User
+        </option>
+
+        <option value="host">
+            Host
+        </option>
+
+    </select>
+
+
+    <button
+        id="registerButton"
+        class="register-button"
+        onclick="register()"
+    >
+        Create Account
+    </button>
+
+
+    <div
+        id="message"
+        class="message"
+    ></div>
+
+
+    <div class="login-link">
+
+        Already have an account?
+
+        <a href="login.html">
+            Login
+        </a>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+    // ==============================
+    // SUPABASE
+    // ==============================
+
+    const SUPABASE_URL =
+        "https://aodkljvskeuumrqesynm.supabase.co";
+
+
+    const SUPABASE_KEY =
+        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+
+
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
+        );
+
+
+    // ==============================
+    // REGISTER
+    // ==============================
+
+    async function register() {
+
+        const username =
+            document
+            .getElementById("username")
+            .value
+            .trim();
+
+
+        const email =
+            document
+            .getElementById("email")
+            .value
+            .trim();
+
+
+        const password =
+            document
+            .getElementById("password")
+            .value;
+
+
+        const role =
+            document
+            .getElementById("role")
+            .value;
+
+
+        const message =
+            document
+            .getElementById("message");
+
+
+        const button =
+            document
+            .getElementById("registerButton");
+
+
+        if (!username) {
+
+            message.textContent =
+                "Please enter a username.";
+
+            return;
+
+        }
+
+
+        if (!email) {
+
+            message.textContent =
+                "Please enter your email.";
+
+            return;
+
+        }
+
+
+        if (
+            password.length < 6
+        ) {
+
+            message.textContent =
+                "Password must be at least 6 characters.";
+
+            return;
+
+        }
+
+
+        button.disabled = true;
+
+
+        message.textContent =
+            "Creating account...";
+
+
+        // ==========================
+        // CREATE SUPABASE ACCOUNT
+        // ==========================
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+            .auth
+            .signUp({
+                email:
+                    email,
+
+                password:
+                    password
+            });
+
+
+        if (error) {
+
+            console.error(error);
+
+
+            message.textContent =
+                error.message;
+
+
+            button.disabled = false;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // CHECK USER
+        // ==========================
+
+        if (!data.user) {
+
+            message.textContent =
+                "Registration failed.";
+
+            button.disabled = false;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // CREATE PROFILE
+        // ==========================
+
+        const {
+            error:
+                profileError
+        } =
+            await supabaseClient
+            .from("Profile")
+            .insert({
+
+                username:
+                    username,
+
+                role:
+                    role,
+
+                diamonds:
+                    role === "user"
+                        ? 10000
+                        : 0,
+
+                auth_id:
+                    data.user.id
+
+            });
+
+
+        if (profileError) {
+
+            console.error(
+                profileError
+            );
+
+
+            message.textContent =
+                "Account created, but profile creation failed.";
+
+            button.disabled = false;
+
+            return;
+
+        }
+
+
+        message.textContent =
+            "Account created successfully!";
+
+
+        setTimeout(
+            function() {
+
+                window.location.href =
+                    "login.html";
+
+            },
+            1500
+        );
+
+    }
+
+
+</script>
+
+
+</body>
+
+</html>
