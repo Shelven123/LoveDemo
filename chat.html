@@ -3,636 +3,696 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>LoveDemo Chat</title>
+    <title>LoveDemo Chat</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
+    <style>
 
-* {
-    box-sizing: border-box;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f5f7;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
 
-.header {
-    height: 65px;
-    background: white;
-    border-bottom: 1px solid #eee;
+        .header {
+            height: 65px;
+            background: white;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
 
-    display: flex;
-    align-items: center;
+        .back {
+            font-size: 25px;
+            cursor: pointer;
+            margin-right: 12px;
+        }
 
-    padding: 0 15px;
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
 
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+        .host-info {
+            flex: 1;
+        }
 
-    z-index: 10;
-}
+        .host-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-.back {
-    border: none;
-    background: none;
-    font-size: 25px;
-    margin-right: 10px;
-    cursor: pointer;
-}
+        .online {
+            font-size: 12px;
+            color: #22c55e;
+            margin-top: 3px;
+        }
 
-.host-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-}
+        .diamonds {
+            background: #fff4cc;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #d97706;
+        }
 
-.host-info {
-    margin-left: 10px;
-}
+        .chat-area {
+            padding: 15px;
+            padding-bottom: 90px;
+            min-height: calc(100vh - 65px);
+        }
 
-.host-name {
-    font-size: 17px;
-    font-weight: bold;
-}
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
 
-.online {
-    color: #22c55e;
-    font-size: 12px;
-    margin-top: 3px;
-}
+        .mine {
+            margin-left: auto;
+            background: #ff4f81;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
 
-.chat {
-    padding: 85px 15px 90px;
-    max-width: 700px;
-    margin: auto;
-}
+        .theirs {
+            margin-right: auto;
+            background: white;
+            color: #222;
+            border-bottom-left-radius: 5px;
+        }
 
-.message {
-    max-width: 75%;
-    padding: 11px 14px;
-    border-radius: 18px;
-    margin-bottom: 12px;
-    font-size: 15px;
-    line-height: 1.4;
-    word-wrap: break-word;
-}
+        .empty {
+            text-align: center;
+            color: #999;
+            margin-top: 100px;
+        }
 
-.user-message {
-    background: #ff4f81;
-    color: white;
-    margin-left: auto;
-    border-bottom-right-radius: 5px;
-}
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            display: flex;
+            gap: 8px;
+        }
 
-.host-message {
-    background: white;
-    color: #222;
-    margin-right: auto;
-    border-bottom-left-radius: 5px;
-}
+        .input-area input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 22px;
+            padding: 11px 15px;
+            outline: none;
+            font-size: 15px;
+        }
 
-.time {
-    font-size: 10px;
-    opacity: 0.6;
-    margin-top: 4px;
-}
+        .send-button {
+            border: none;
+            background: #ff4f81;
+            color: white;
+            border-radius: 22px;
+            padding: 0 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-.input-area {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
 
-    background: white;
-    border-top: 1px solid #eee;
+        .cost {
+            position: absolute;
+            bottom: 58px;
+            right: 15px;
+            font-size: 11px;
+            color: #999;
+        }
 
-    padding: 10px;
-}
-
-.input-box {
-    max-width: 700px;
-    margin: auto;
-
-    display: flex;
-    gap: 8px;
-}
-
-.message-input {
-    flex: 1;
-
-    border: 1px solid #ddd;
-    border-radius: 25px;
-
-    padding: 12px 16px;
-
-    outline: none;
-
-    font-size: 15px;
-}
-
-.send {
-    width: 50px;
-    height: 45px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #ff4f81;
-    color: white;
-
-    font-size: 18px;
-
-    cursor: pointer;
-}
-
-</style>
+    </style>
 
 </head>
+
 
 <body>
 
 
-<!-- HEADER -->
-
-<div class="header">
-
-    <button
-        class="back"
-        onclick="history.back()"
-    >
-
-        ‹
-
-    </button>
-
-
-    <img
-        id="hostAvatar"
-        class="host-avatar"
-        src="https://i.pravatar.cc/200?img=47"
-    >
-
-
-    <div class="host-info">
+    <div class="header">
 
         <div
-            id="hostName"
-            class="host-name"
+            class="back"
+            onclick="history.back()"
+        >
+            ‹
+        </div>
+
+
+        <img
+            id="hostAvatar"
+            class="avatar"
+            src="https://i.pravatar.cc/200?img=47"
         >
 
-            Amy
+
+        <div class="host-info">
+
+            <div
+                id="hostName"
+                class="host-name"
+            >
+                Amy
+            </div>
+
+            <div class="online">
+                🟢 Online
+            </div>
 
         </div>
 
-        <div class="online">
 
-            🟢 Online
-
+        <div
+            id="diamondBalance"
+            class="diamonds"
+        >
+            💎 0
         </div>
 
     </div>
 
-</div>
+
+    <div
+        id="chatArea"
+        class="chat-area"
+    >
+
+        <div
+            id="emptyMessage"
+            class="empty"
+        >
+            No messages yet
+        </div>
+
+    </div>
 
 
-<!-- CHAT -->
-
-<div
-    id="chat"
-    class="chat"
->
-</div>
+    <div class="cost">
+        Each message costs 💎 10
+    </div>
 
 
-<!-- INPUT -->
-
-<div class="input-area">
-
-    <div class="input-box">
+    <div class="input-area">
 
         <input
             id="messageInput"
-            class="message-input"
             type="text"
             placeholder="Type a message..."
+            autocomplete="off"
         >
 
         <button
             id="sendButton"
-            class="send"
+            class="send-button"
+            onclick="sendMessage()"
         >
-
-            ➤
-
+            Send
         </button>
 
     </div>
-
-</div>
 
 
 <script>
 
 
-/* =========================
-   SUPABASE
-========================= */
+    // ==============================
+    // SUPABASE
+    // ==============================
 
-const SUPABASE_URL =
-    "https://aodkljvskeuumrqesynm.supabase.co";
+    const SUPABASE_URL =
+        "https://aodkljvskeuumrqesynm.supabase.co";
 
-
-const SUPABASE_KEY =
-    "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
-
-
-const supabaseClient =
-    window.supabase.createClient(
-
-        SUPABASE_URL,
-
-        SUPABASE_KEY
-
-    );
+    const SUPABASE_KEY =
+        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
 
 
-/* =========================
-   USER / HOST
-========================= */
-
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
-
-
-const currentHost =
-    params.get("name") || "Amy";
-
-
-const hostAvatar =
-    params.get("avatar");
-
-
-document.getElementById(
-    "hostName"
-).textContent =
-    currentHost;
-
-
-if (hostAvatar) {
-
-    document.getElementById(
-        "hostAvatar"
-    ).src =
-        hostAvatar;
-
-}
-
-
-/* =========================
-   LOAD OLD MESSAGES
-========================= */
-
-async function loadMessages() {
-
-    const { data, error } =
-        await supabaseClient
-
-        .from("Message")
-
-        .select("*")
-
-        .or(
-            `and(sender.eq.Vincent,receiver.eq.${currentHost}),and(sender.eq.${currentHost},receiver.eq.Vincent)`
-        )
-
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
+    const supabaseClient =
+        window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_KEY
         );
 
 
-    if (error) {
+    // ==============================
+    // CURRENT USER / HOST
+    // ==============================
 
-        console.error(
-            "Load messages error:",
-            error
+    const currentUser =
+        "Vincent";
+
+
+    const params =
+        new URLSearchParams(
+            window.location.search
         );
 
-        return;
+
+    const currentHost =
+        params.get("name") || "Amy";
+
+
+    const avatar =
+        params.get("avatar");
+
+
+    document.getElementById("hostName").textContent =
+        currentHost;
+
+
+    if (avatar) {
+
+        document.getElementById("hostAvatar").src =
+            avatar;
 
     }
 
 
-    const chat =
-        document.getElementById(
-            "chat"
-        );
+    // ==============================
+    // DISPLAY MESSAGE
+    // ==============================
 
+    function displayMessage(message) {
 
-    chat.innerHTML = "";
+        const chatArea =
+            document.getElementById("chatArea");
 
 
-    data.forEach(
-        displayMessage
-    );
+        const empty =
+            document.getElementById("emptyMessage");
 
-}
 
+        if (empty) {
 
-/* =========================
-   DISPLAY MESSAGE
-========================= */
-
-function displayMessage(item) {
-
-    const chat =
-        document.getElementById(
-            "chat"
-        );
-
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-
-    if (
-        item.sender ===
-        "Vincent"
-    ) {
-
-        div.className =
-            "message user-message";
-
-    }
-
-    else {
-
-        div.className =
-            "message host-message";
-
-    }
-
-
-    const time =
-        new Date(
-            item.created_at
-        ).toLocaleTimeString(
-            [],
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
-
-
-    div.innerHTML = `
-
-        ${escapeHtml(item.message)}
-
-        <div class="time">
-
-            ${time}
-
-        </div>
-
-    `;
-
-
-    chat.appendChild(div);
-
-
-    chat.scrollTop =
-        chat.scrollHeight;
-
-}
-
-
-/* =========================
-   ESCAPE HTML
-========================= */
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.textContent =
-        text;
-
-    return div.innerHTML;
-
-}
-
-
-/* =========================
-   SEND MESSAGE
-========================= */
-
-async function sendMessage() {
-
-    const input =
-        document.getElementById(
-            "messageInput"
-        );
-
-
-    const message =
-        input.value.trim();
-
-
-    if (!message) return;
-
-
-    input.disabled = true;
-
-
-    const { error } =
-        await supabaseClient
-
-        .from("Message")
-
-        .insert({
-
-            sender: "Vincent",
-
-            receiver:
-                currentHost,
-
-            message:
-                message
-
-        });
-
-
-    input.disabled = false;
-
-
-    if (error) {
-
-        console.error(
-            "Send message error:",
-            error
-        );
-
-        alert(
-            "Message could not be sent."
-        );
-
-        return;
-
-    }
-
-
-    input.value = "";
-
-}
-
-
-/* =========================
-   REALTIME
-========================= */
-
-const channel =
-    supabaseClient
-
-    .channel(
-        "love-demo-chat"
-    )
-
-    .on(
-
-        "postgres_changes",
-
-        {
-
-            event: "INSERT",
-
-            schema: "public",
-
-            table: "Message"
-
-        },
-
-        function(payload) {
-
-            const message =
-                payload.new;
-
-
-            const isCurrentChat =
-
-                (
-
-                    message.sender ===
-                    "Vincent" &&
-
-                    message.receiver ===
-                    currentHost
-
-                )
-
-                ||
-
-                (
-
-                    message.sender ===
-                    currentHost &&
-
-                    message.receiver ===
-                    "Vincent"
-
-                );
-
-
-            if (
-                isCurrentChat
-            ) {
-
-                displayMessage(
-                    message
-                );
-
-            }
+            empty.remove();
 
         }
 
-    )
 
-    .subscribe(
-        function(status) {
+        const div =
+            document.createElement("div");
 
-            console.log(
-                "Realtime status:",
-                status
+
+        div.classList.add("message");
+
+
+        if (message.sender === currentUser) {
+
+            div.classList.add("mine");
+
+        } else {
+
+            div.classList.add("theirs");
+
+        }
+
+
+        div.textContent =
+            message.message;
+
+
+        chatArea.appendChild(div);
+
+
+        chatArea.scrollTop =
+            chatArea.scrollHeight;
+
+    }
+
+
+    // ==============================
+    // LOAD OLD MESSAGES
+    // ==============================
+
+    async function loadMessages() {
+
+        const { data, error } =
+            await supabaseClient
+            .from("Message")
+            .select("*")
+            .or(
+                `and(sender.eq.${currentUser},receiver.eq.${currentHost}),and(sender.eq.${currentHost},receiver.eq.${currentUser})`
+            )
+            .order(
+                "created_at",
+                {
+                    ascending: true
+                }
             );
 
-        }
-    );
 
+        if (error) {
 
-/* =========================
-   ENTER TO SEND
-========================= */
+            console.error(
+                "Load messages error:",
+                error
+            );
 
-document.getElementById(
-    "messageInput"
-)
-.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (
-            event.key ===
-            "Enter"
-        ) {
-
-            sendMessage();
+            return;
 
         }
+
+
+        data.forEach(
+            function(message) {
+
+                displayMessage(message);
+
+            }
+        );
 
     }
-);
 
 
-/* =========================
-   SEND BUTTON
-========================= */
+    // ==============================
+    // LOAD DIAMOND BALANCE
+    // ==============================
 
-document.getElementById(
-    "sendButton"
-)
-.addEventListener(
-    "click",
-    sendMessage
-);
+    async function loadDiamonds() {
+
+        const { data, error } =
+            await supabaseClient
+            .from("Profile")
+            .select("diamonds")
+            .ilike(
+                "username",
+                currentUser
+            )
+            .single();
 
 
-/* =========================
-   START
-========================= */
+        if (error) {
 
-loadMessages();
+            console.error(
+                "Diamond load error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        updateDiamondDisplay(
+            data.diamonds
+        );
+
+    }
+
+
+    // ==============================
+    // UPDATE DIAMOND DISPLAY
+    // ==============================
+
+    function updateDiamondDisplay(
+        amount
+    ) {
+
+        document.getElementById(
+            "diamondBalance"
+        ).textContent =
+            "💎 " +
+            Number(amount).toLocaleString();
+
+    }
+
+
+    // ==============================
+    // SEND MESSAGE
+    // ==============================
+
+    async function sendMessage() {
+
+        const input =
+            document.getElementById(
+                "messageInput"
+            );
+
+
+        const button =
+            document.getElementById(
+                "sendButton"
+            );
+
+
+        const message =
+            input.value.trim();
+
+
+        if (!message) {
+
+            return;
+
+        }
+
+
+        button.disabled = true;
+
+
+        input.disabled = true;
+
+
+        // ==========================
+        // DIAMOND RPC
+        // ==========================
+
+        const { data, error } =
+            await supabaseClient
+            .rpc(
+                "send_chat_message",
+                {
+                    p_sender:
+                        currentUser,
+
+                    p_receiver:
+                        currentHost,
+
+                    p_message:
+                        message
+                }
+            );
+
+
+        if (error) {
+
+            console.error(
+                "Send message error:",
+                error
+            );
+
+            alert(
+                "Message failed to send."
+            );
+
+
+            button.disabled = false;
+
+            input.disabled = false;
+
+            return;
+
+        }
+
+
+        console.log(
+            "Diamond result:",
+            data
+        );
+
+
+        // ==========================
+        // CHECK RESULT
+        // ==========================
+
+        if (
+            !data ||
+            data.success !== true
+        ) {
+
+            if (
+                data &&
+                data.error ===
+                "Not enough diamonds"
+            ) {
+
+                alert(
+                    "Not enough diamonds 💎"
+                );
+
+            } else {
+
+                alert(
+                    data?.error ||
+                    "Message failed to send."
+                );
+
+            }
+
+
+            button.disabled = false;
+
+            input.disabled = false;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // SUCCESS
+        // ==========================
+
+        input.value = "";
+
+
+        // Reload balance
+
+        await loadDiamonds();
+
+
+        button.disabled = false;
+
+        input.disabled = false;
+
+
+        input.focus();
+
+    }
+
+
+    // ==============================
+    // REALTIME
+    // ==============================
+
+    const channel =
+        supabaseClient
+        .channel(
+            "love-demo-chat"
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "INSERT",
+
+                schema: "public",
+
+                table: "Message"
+            },
+
+            function(payload) {
+
+                const message =
+                    payload.new;
+
+
+                const isCurrentChat =
+                    (
+                        message.sender ===
+                        currentUser &&
+                        message.receiver ===
+                        currentHost
+                    )
+                    ||
+                    (
+                        message.sender ===
+                        currentHost &&
+                        message.receiver ===
+                        currentUser
+                    );
+
+
+                if (
+                    isCurrentChat
+                ) {
+
+                    displayMessage(
+                        message
+                    );
+
+                }
+
+            }
+        )
+        .subscribe(
+            function(status) {
+
+                console.log(
+                    "Realtime status:",
+                    status
+                );
+
+            }
+        );
+
+
+    // ==============================
+    // ENTER KEY
+    // ==============================
+
+    document
+        .getElementById(
+            "messageInput"
+        )
+        .addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    sendMessage();
+
+                }
+
+            }
+        );
+
+
+    // ==============================
+    // START
+    // ==============================
+
+    loadMessages();
+
+    loadDiamonds();
+
 
 </script>
+
 
 </body>
 
