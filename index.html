@@ -9,6 +9,8 @@
 
 <title>LoveDemo</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 
 * {
@@ -205,6 +207,94 @@ body {
     margin-bottom: 3px;
 }
 
+/* RESET PASSWORD */
+
+.reset-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.reset-card {
+    width: 100%;
+    max-width: 400px;
+    background: white;
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.reset-logo {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    color: #ff4f81;
+    margin-bottom: 8px;
+}
+
+.reset-title {
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.reset-subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 22px;
+}
+
+.reset-card label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.reset-card input {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 15px;
+    outline: none;
+}
+
+.reset-card input:focus {
+    border-color: #ff4f81;
+}
+
+.reset-button {
+    width: 100%;
+    border: none;
+    background: #ff4f81;
+    color: white;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.reset-button:disabled {
+    background: #ccc;
+}
+
+.reset-message {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
 /* DESKTOP */
 
 @media (min-width: 700px) {
@@ -255,8 +345,6 @@ body {
     </div>
 
 
-    <!-- SEARCH -->
-
     <input
         class="search"
         id="search"
@@ -264,8 +352,6 @@ body {
         placeholder="🔍 Search hosts..."
     >
 
-
-    <!-- HOSTS -->
 
     <div
         class="hosts"
@@ -323,6 +409,70 @@ body {
 </div>
 
 
+<!-- RESET PASSWORD -->
+
+<div
+    class="reset-overlay"
+    id="resetOverlay"
+>
+
+    <div class="reset-card">
+
+        <div class="reset-logo">
+            ❤️ LoveDemo
+        </div>
+
+        <div class="reset-title">
+            Set New Password
+        </div>
+
+        <div class="reset-subtitle">
+            Enter your new password below.
+        </div>
+
+
+        <label>
+            New Password
+        </label>
+
+        <input
+            id="newPassword"
+            type="password"
+            placeholder="Enter new password"
+            autocomplete="new-password"
+        >
+
+
+        <label>
+            Confirm Password
+        </label>
+
+        <input
+            id="confirmPassword"
+            type="password"
+            placeholder="Confirm new password"
+            autocomplete="new-password"
+        >
+
+
+        <button
+            id="resetButton"
+            class="reset-button"
+            onclick="updatePassword()"
+        >
+            Update Password
+        </button>
+
+
+        <div
+            id="resetMessage"
+            class="reset-message"
+        ></div>
+
+    </div>
+
+</div>
+
 
 <script>
 
@@ -337,10 +487,196 @@ const SUPABASE_KEY =
     "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
 
 
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
 let allHosts = [];
 
 
-/* LOAD HOSTS */
+/* ==============================
+   RESET PASSWORD
+============================== */
+
+function showResetPassword() {
+
+    document
+        .getElementById("resetOverlay")
+        .style.display = "flex";
+
+}
+
+
+/* Listen for Supabase password recovery */
+
+supabaseClient.auth.onAuthStateChange(
+    async function(event, session) {
+
+        console.log(
+            "Auth event:",
+            event
+        );
+
+
+        if (event === "PASSWORD_RECOVERY") {
+
+            showResetPassword();
+
+        }
+
+    }
+);
+
+
+/* Check current session */
+
+async function checkResetSession() {
+
+    const {
+        data
+    } = await supabaseClient
+        .auth
+        .getSession();
+
+
+    if (
+        data &&
+        data.session &&
+        window.location.hash
+    ) {
+
+        const hash =
+            window.location.hash;
+
+
+        if (
+            hash.includes("access_token") ||
+            hash.includes("type=recovery")
+        ) {
+
+            showResetPassword();
+
+        }
+
+    }
+
+}
+
+
+async function updatePassword() {
+
+    const newPassword =
+        document
+        .getElementById("newPassword")
+        .value;
+
+
+    const confirmPassword =
+        document
+        .getElementById("confirmPassword")
+        .value;
+
+
+    const message =
+        document
+        .getElementById("resetMessage");
+
+
+    const button =
+        document
+        .getElementById("resetButton");
+
+
+    if (!newPassword) {
+
+        message.textContent =
+            "Please enter a new password.";
+
+        return;
+
+    }
+
+
+    if (newPassword.length < 6) {
+
+        message.textContent =
+            "Password must be at least 6 characters.";
+
+        return;
+
+    }
+
+
+    if (newPassword !== confirmPassword) {
+
+        message.textContent =
+            "Passwords do not match.";
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+    message.textContent =
+        "Updating password...";
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+        .auth
+        .updateUser({
+
+            password:
+                newPassword
+
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        message.textContent =
+            error.message;
+
+        button.disabled = false;
+
+        return;
+
+    }
+
+
+    message.textContent =
+        "Password updated successfully!";
+
+
+    setTimeout(
+        async function() {
+
+            await supabaseClient
+                .auth
+                .signOut();
+
+            window.location.href =
+                "login.html";
+
+        },
+        1200
+    );
+
+}
+
+
+/* ==============================
+   LOAD HOSTS
+============================== */
 
 async function loadHosts() {
 
@@ -358,7 +694,8 @@ async function loadHosts() {
 
                 headers: {
 
-                    "apikey": SUPABASE_KEY,
+                    "apikey":
+                        SUPABASE_KEY,
 
                     "Authorization":
                         `Bearer ${SUPABASE_KEY}`
@@ -383,7 +720,8 @@ async function loadHosts() {
             await response.json();
 
 
-        allHosts = hosts;
+        allHosts =
+            hosts;
 
 
         displayHosts(hosts);
@@ -413,8 +751,9 @@ async function loadHosts() {
 }
 
 
-
-/* DISPLAY HOSTS */
+/* ==============================
+   DISPLAY HOSTS
+============================== */
 
 function displayHosts(hosts) {
 
@@ -442,140 +781,169 @@ function displayHosts(hosts) {
     }
 
 
-    hosts.forEach(host => {
+    hosts.forEach(
+        function(host) {
+
+            const card =
+                document.createElement("div");
 
 
-        const card =
-            document.createElement("div");
+            card.className =
+                "card";
 
 
-        card.className = "card";
+            const avatar =
+
+                host.avatar_url &&
+
+                host.avatar_url.trim() !== ""
+
+                ? host.avatar_url
+
+                : "https://i.pravatar.cc/500?img=47";
 
 
-        const avatar =
+            card.innerHTML = `
 
-            host.avatar_url &&
+                <div class="avatar-box">
 
-            host.avatar_url.trim() !== ""
+                    <img
+                        class="avatar"
+                        src="${avatar}"
+                        alt="${host.username}"
+                        onerror="this.src='https://i.pravatar.cc/500?img=47'"
+                    >
 
-            ? host.avatar_url
+                    <div class="online">
 
-            : "https://i.pravatar.cc/500?img=47";
+                        🟢 Online
 
-
-        card.innerHTML = `
-
-            <div class="avatar-box">
-
-                <img
-                    class="avatar"
-                    src="${avatar}"
-                    alt="${host.username}"
-                    onerror="this.src='https://i.pravatar.cc/500?img=47'"
-                >
-
-                <div class="online">
-
-                    🟢 Online
-
-                </div>
-
-            </div>
-
-
-            <div class="info">
-
-                <div class="name">
-
-                    ${host.username}
+                    </div>
 
                 </div>
 
 
-                <div class="bio">
+                <div class="info">
 
-                    ${host.bio || "Let's chat ❤️"}
+                    <div class="name">
+
+                        ${host.username}
+
+                    </div>
+
+
+                    <div class="bio">
+
+                        ${host.bio || "Let's chat ❤️"}
+
+                    </div>
+
+
+                    <button
+                        class="chat-button"
+                        onclick="openHost('${host.id}')"
+                    >
+
+                        💬 Chat
+
+                    </button>
 
                 </div>
 
-
-                <button
-                    class="chat-button"
-                    onclick="openHost('${host.id}')"
-                >
-
-                    💬 Chat
-
-                </button>
-
-            </div>
-
-        `;
+            `;
 
 
-        container.appendChild(card);
+            container.appendChild(card);
 
-    });
+        }
+    );
 
 }
 
 
-
-/* OPEN HOST */
+/* ==============================
+   OPEN HOST
+============================== */
 
 function openHost(hostId) {
 
     const host =
         allHosts.find(
-            item => item.id === hostId
+            function(item) {
+
+                return item.id === hostId;
+
+            }
         );
+
 
     if (!host) return;
 
+
     const params =
         new URLSearchParams({
-            id: host.id,
-            name: host.username,
-            bio: host.bio || "",
-            avatar: host.avatar_url || ""
+
+            id:
+                host.id,
+
+            name:
+                host.username,
+
+            bio:
+                host.bio || "",
+
+            avatar:
+                host.avatar_url || ""
+
         });
 
+
     window.location.href =
-        "chat.html?" + params.toString();
+        "chat.html?" +
+        params.toString();
 
 }
 
 
-
-/* SEARCH */
+/* ==============================
+   SEARCH
+============================== */
 
 document
     .getElementById("search")
-    .addEventListener("input", function() {
+    .addEventListener(
+        "input",
+        function() {
 
-        const keyword =
-            this.value.toLowerCase();
-
-
-        const filtered =
-            allHosts.filter(host =>
-
-                host.username
-                    .toLowerCase()
-                    .includes(keyword)
-
-            );
+            const keyword =
+                this.value.toLowerCase();
 
 
-        displayHosts(filtered);
+            const filtered =
+                allHosts.filter(
+                    function(host) {
 
-    });
+                        return host.username
+                            .toLowerCase()
+                            .includes(keyword);
+
+                    }
+                );
 
 
+            displayHosts(filtered);
 
-/* START */
+        }
+    );
+
+
+/* ==============================
+   START
+============================== */
 
 loadHosts();
+
+checkResetSession();
 
 
 </script>
