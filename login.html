@@ -1,115 +1,175 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
+<title>LoveDemo Login</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <title>LoveDemo Login</title>
+<style>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+* {
+    box-sizing: border-box;
+}
 
-    <style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    min-height: 100vh;
 
-        * {
-            box-sizing: border-box;
-        }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+.card {
+    width: 90%;
+    max-width: 400px;
 
-        .card {
-            width: 90%;
-            max-width: 400px;
-            background: white;
-            padding: 30px 25px;
-            border-radius: 20px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
-        }
+    background: white;
 
-        .logo {
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            color: #ff4f81;
-            margin-bottom: 8px;
-        }
+    padding: 30px 25px;
 
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 25px;
-        }
+    border-radius: 20px;
 
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
+    box-shadow:
+        0 5px 25px rgba(0,0,0,0.08);
+}
 
-        input {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 15px;
-            outline: none;
-        }
+.logo {
+    text-align: center;
 
-        input:focus {
-            border-color: #ff4f81;
-        }
+    font-size: 28px;
 
-        .login-button {
-            width: 100%;
-            border: none;
-            background: #ff4f81;
-            color: white;
-            padding: 13px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    font-weight: bold;
 
-        .login-button:disabled {
-            background: #ccc;
-        }
+    color: #ff4f81;
 
-        .message {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            min-height: 20px;
-        }
+    margin-bottom: 8px;
+}
 
-        .register-link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
+.subtitle {
+    text-align: center;
 
-        .register-link a {
-            color: #ff4f81;
-            text-decoration: none;
-            font-weight: bold;
-        }
+    color: #888;
 
-    </style>
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+input {
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+
+    margin-bottom: 15px;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+input:focus {
+    border-color: #ff4f81;
+}
+
+.login-button {
+    width: 100%;
+
+    border: none;
+
+    background: #ff4f81;
+
+    color: white;
+
+    padding: 13px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.login-button:disabled {
+    background: #ccc;
+
+    cursor: not-allowed;
+}
+
+.forgot-password {
+    text-align: center;
+
+    margin-top: 16px;
+
+    margin-bottom: 5px;
+}
+
+.forgot-password button {
+    background: none;
+
+    border: none;
+
+    color: #ff4f81;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    padding: 5px;
+}
+
+.message {
+    text-align: center;
+
+    margin-top: 15px;
+
+    font-size: 14px;
+
+    min-height: 20px;
+
+    line-height: 1.4;
+}
+
+.register-link {
+    text-align: center;
+
+    margin-top: 20px;
+
+    font-size: 14px;
+}
+
+.register-link a {
+    color: #ff4f81;
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+</style>
 
 </head>
 
@@ -119,18 +179,18 @@
 
 <div class="card">
 
-
     <div class="logo">
         ❤️ LoveDemo
     </div>
-
 
     <div class="subtitle">
         Welcome back
     </div>
 
 
-    <label>
+    <!-- Email -->
+
+    <label for="email">
         Email
     </label>
 
@@ -142,7 +202,9 @@
     >
 
 
-    <label>
+    <!-- Password -->
+
+    <label for="password">
         Password
     </label>
 
@@ -154,6 +216,8 @@
     >
 
 
+    <!-- Login -->
+
     <button
         id="loginButton"
         class="login-button"
@@ -163,11 +227,26 @@
     </button>
 
 
+    <!-- Forgot Password -->
+
+    <div class="forgot-password">
+
+        <button onclick="resetPassword()">
+            Forgot Password?
+        </button>
+
+    </div>
+
+
+    <!-- Message -->
+
     <div
         id="message"
         class="message"
     ></div>
 
+
+    <!-- Register -->
 
     <div class="register-link">
 
@@ -179,122 +258,113 @@
 
     </div>
 
-
 </div>
+
 
 
 <script>
 
 
-    // ==============================
-    // SUPABASE
-    // ==============================
+/* =========================
+   SUPABASE
+========================= */
 
-    const SUPABASE_URL =
-        "https://aodkljvskeuumrqesynm.supabase.co";
-
-
-    const SUPABASE_KEY =
-        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+const SUPABASE_URL =
+    "https://aodkljvskeuumrqesynm.supabase.co";
 
 
-    const supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
+const SUPABASE_KEY =
+    "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
 
 
-    // ==============================
-    // LOGIN
-    // ==============================
-
-    async function login() {
-
-        const email =
-            document
-            .getElementById("email")
-            .value
-            .trim();
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
 
-        const password =
-            document
-            .getElementById("password")
-            .value;
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login() {
+
+    const email =
+        document
+        .getElementById("email")
+        .value
+        .trim();
 
 
-        const message =
-            document
-            .getElementById("message");
+    const password =
+        document
+        .getElementById("password")
+        .value;
 
 
-        const button =
-            document
-            .getElementById("loginButton");
+    const message =
+        document
+        .getElementById("message");
 
 
-        if (!email) {
-
-            message.textContent =
-                "Please enter your email.";
-
-            return;
-
-        }
+    const button =
+        document
+        .getElementById("loginButton");
 
 
-        if (!password) {
-
-            message.textContent =
-                "Please enter your password.";
-
-            return;
-
-        }
-
-
-        button.disabled = true;
-
+    if (!email) {
 
         message.textContent =
-            "Logging in...";
+            "Please enter your email.";
+
+        return;
+    }
 
 
-        // ==========================
-        // SUPABASE LOGIN
-        // ==========================
+    if (!password) {
+
+        message.textContent =
+            "Please enter your password.";
+
+        return;
+    }
+
+
+    button.disabled = true;
+
+    message.textContent =
+        "Logging in...";
+
+
+    try {
 
         const {
             data,
             error
         } =
-            await supabaseClient
-            .auth
-            .signInWithPassword({
+        await supabaseClient
+        .auth
+        .signInWithPassword({
 
-                email:
-                    email,
+            email: email,
 
-                password:
-                    password
+            password: password
 
-            });
+        });
 
 
         if (error) {
 
             console.error(error);
 
-
             message.textContent =
                 error.message;
-
 
             button.disabled = false;
 
             return;
-
         }
 
 
@@ -306,7 +376,6 @@
             button.disabled = false;
 
             return;
-
         }
 
 
@@ -314,21 +383,104 @@
             "Login successful!";
 
 
-        // ==========================
-        // GO HOME
-        // ==========================
+        setTimeout(function() {
 
-        setTimeout(
-            function() {
+            window.location.href =
+                "index.html";
 
-                window.location.href =
-                    "index.html";
+        }, 800);
 
-            },
-            800
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+            "Something went wrong.";
+
+        button.disabled = false;
+    }
+
+}
+
+
+
+/* =========================
+   FORGOT PASSWORD
+========================= */
+
+async function resetPassword() {
+
+    const email =
+        document
+        .getElementById("email")
+        .value
+        .trim();
+
+
+    const message =
+        document
+        .getElementById("message");
+
+
+    if (!email) {
+
+        message.textContent =
+            "Please enter your email first.";
+
+        return;
+    }
+
+
+    message.textContent =
+        "Sending password reset email...";
+
+
+    try {
+
+        const {
+            error
+        } =
+        await supabaseClient
+        .auth
+        .resetPasswordForEmail(
+
+            email,
+
+            {
+
+                redirectTo:
+                    "https://shelven123.github.io/LoveDemo/"
+
+            }
+
         );
 
+
+        if (error) {
+
+            console.error(error);
+
+            message.textContent =
+                error.message;
+
+            return;
+        }
+
+
+        message.textContent =
+            "Password reset email sent. Please check your email.";
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.textContent =
+            "Unable to send password reset email.";
     }
+
+}
 
 
 </script>
@@ -337,3 +489,4 @@
 </body>
 
 </html>
+```
