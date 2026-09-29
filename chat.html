@@ -1,160 +1,306 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>LoveDemo Chat</title>
+<title>LoveDemo Chat</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
+body {
 
-        .header {
-            height: 65px;
-            background: white;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            border-bottom: 1px solid #ddd;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+    margin: 0;
 
-        .back {
-            font-size: 25px;
-            cursor: pointer;
-            margin-right: 12px;
-        }
+    font-family: Arial, sans-serif;
 
-        .avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 10px;
-        }
+    background: #f5f5f5;
 
-        .host-info {
-            flex: 1;
-        }
+    height: 100vh;
 
-        .host-name {
-            font-size: 16px;
-            font-weight: bold;
-        }
+    display: flex;
 
-        .online {
-            font-size: 12px;
-            color: #22c55e;
-            margin-top: 3px;
-        }
+    flex-direction: column;
 
-        .diamonds {
-            background: #fff4cc;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #d97706;
-        }
+}
 
-        .chat-area {
-            padding: 15px;
-            padding-bottom: 90px;
-            min-height: calc(100vh - 65px);
-        }
 
-        .message {
-            max-width: 75%;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            border-radius: 18px;
-            word-wrap: break-word;
-        }
+/* =========================
+   HEADER
+========================= */
 
-        .mine {
-            margin-left: auto;
-            background: #ff4f81;
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
+.header {
 
-        .theirs {
-            margin-right: auto;
-            background: white;
-            color: #222;
-            border-bottom-left-radius: 5px;
-        }
+    height: 65px;
 
-        .empty {
-            text-align: center;
-            color: #999;
-            margin-top: 100px;
-        }
+    background: white;
 
-        .input-area {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid #ddd;
-            padding: 10px;
-            display: flex;
-            gap: 8px;
-        }
+    border-bottom: 1px solid #eee;
 
-        .input-area input {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 22px;
-            padding: 11px 15px;
-            outline: none;
-            font-size: 15px;
-        }
+    display: flex;
 
-        .send-button {
-            border: none;
-            background: #ff4f81;
-            color: white;
-            border-radius: 22px;
-            padding: 0 18px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    align-items: center;
 
-        .send-button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
+    justify-content: space-between;
 
-        .cost {
-            position: absolute;
-            bottom: 58px;
-            right: 15px;
-            font-size: 11px;
-            color: #999;
-        }
+    padding: 0 15px;
 
-    </style>
+}
+
+.left-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+}
+
+.back-button {
+
+    border: none;
+
+    background: #f5f5f5;
+
+    width: 38px;
+
+    height: 38px;
+
+    border-radius: 50%;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+}
+
+.host-name {
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+}
+
+.online {
+
+    font-size: 11px;
+
+    color: #18a558;
+
+    margin-top: 2px;
+
+}
+
+.balance {
+
+    background: #fff3f7;
+
+    color: #ff4f81;
+
+    padding: 8px 12px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================
+   CHAT AREA
+========================= */
+
+.chat-area {
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 15px;
+
+}
+
+.loading {
+
+    text-align: center;
+
+    color: #999;
+
+    padding: 30px;
+
+}
+
+.message-row {
+
+    display: flex;
+
+    margin-bottom: 12px;
+
+}
+
+.message-row.me {
+
+    justify-content: flex-end;
+
+}
+
+.message-row.host {
+
+    justify-content: flex-start;
+
+}
+
+.message {
+
+    max-width: 75%;
+
+    padding: 10px 13px;
+
+    border-radius: 16px;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+
+    word-break: break-word;
+
+}
+
+.message-row.me .message {
+
+    background: #ff4f81;
+
+    color: white;
+
+    border-bottom-right-radius: 4px;
+
+}
+
+.message-row.host .message {
+
+    background: white;
+
+    color: #333;
+
+    border-bottom-left-radius: 4px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.05);
+
+}
+
+.time {
+
+    font-size: 10px;
+
+    color: #999;
+
+    margin-top: 4px;
+
+}
+
+
+/* =========================
+   INPUT
+========================= */
+
+.input-area {
+
+    background: white;
+
+    border-top: 1px solid #eee;
+
+    padding: 10px;
+
+    display: flex;
+
+    gap: 8px;
+
+}
+
+.message-input {
+
+    flex: 1;
+
+    border: 1px solid #ddd;
+
+    border-radius: 20px;
+
+    padding: 11px 14px;
+
+    font-size: 14px;
+
+    outline: none;
+
+}
+
+.message-input:focus {
+
+    border-color: #ff4f81;
+
+}
+
+.send-button {
+
+    border: none;
+
+    background: #ff4f81;
+
+    color: white;
+
+    width: 48px;
+
+    border-radius: 50%;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+}
+
+.send-button:disabled {
+
+    background: #ccc;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================
+   COST
+========================= */
+
+.cost {
+
+    text-align: center;
+
+    font-size: 11px;
+
+    color: #999;
+
+    padding-bottom: 4px;
+
+}
+
+</style>
 
 </head>
 
@@ -162,30 +308,29 @@
 <body>
 
 
-    <div class="header">
+<!-- =========================
+     HEADER
+========================= -->
 
-        <div
-            class="back"
-            onclick="history.back()"
+<div class="header">
+
+    <div class="left-header">
+
+        <button
+            class="back-button"
+            onclick="goHome()"
         >
-            ‹
-        </div>
+            ←
+        </button>
 
 
-        <img
-            id="hostAvatar"
-            class="avatar"
-            src="https://i.pravatar.cc/200?img=47"
-        >
-
-
-        <div class="host-info">
+        <div>
 
             <div
                 id="hostName"
                 class="host-name"
             >
-                Amy
+                Loading...
             </div>
 
             <div class="online">
@@ -194,190 +339,189 @@
 
         </div>
 
-
-        <div
-            id="diamondBalance"
-            class="diamonds"
-        >
-            💎 0
-        </div>
-
     </div>
 
 
     <div
-        id="chatArea"
-        class="chat-area"
+        id="balance"
+        class="balance"
+    >
+        💎 Loading...
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     CHAT
+========================= -->
+
+<div
+    id="chatArea"
+    class="chat-area"
+>
+
+    <div class="loading">
+        Loading messages...
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     INPUT
+========================= -->
+
+<div class="cost">
+    💎 10 Diamonds per message
+</div>
+
+
+<div class="input-area">
+
+    <input
+        id="messageInput"
+        class="message-input"
+        type="text"
+        placeholder="Type a message..."
+        autocomplete="off"
+        onkeydown="handleEnter(event)"
     >
 
-        <div
-            id="emptyMessage"
-            class="empty"
-        >
-            No messages yet
-        </div>
 
-    </div>
+    <button
+        id="sendButton"
+        class="send-button"
+        onclick="sendMessage()"
+    >
+        ➤
+    </button>
 
+</div>
 
-    <div class="cost">
-        Each message costs 💎 10
-    </div>
-
-
-    <div class="input-area">
-
-        <input
-            id="messageInput"
-            type="text"
-            placeholder="Type a message..."
-            autocomplete="off"
-        >
-
-        <button
-            id="sendButton"
-            class="send-button"
-            onclick="sendMessage()"
-        >
-            Send
-        </button>
-
-    </div>
 
 
 <script>
 
 
-    // ==============================
-    // SUPABASE
-    // ==============================
+/* =========================
+   SUPABASE
+========================= */
 
-    const SUPABASE_URL =
-        "https://aodkljvskeuumrqesynm.supabase.co";
-
-    const SUPABASE_KEY =
-        "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
+const SUPABASE_URL =
+    "https://aodkljvskeuumrqesynm.supabase.co";
 
 
-    const supabaseClient =
-        window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_KEY
-        );
+const SUPABASE_KEY =
+    "sb_publishable_eOzqloWgTbe9CZmNS535hA_25llrr0A";
 
 
-    // ==============================
-    // CURRENT USER / HOST
-    // ==============================
-
-    const currentUser =
-        "Vincent";
-
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
 
 
-    const currentHost =
-        params.get("name") || "Amy";
+/* =========================
+   VARIABLES
+========================= */
+
+let currentAuthUser = null;
+
+let currentProfile = null;
+
+let currentUser = null;
+
+let currentHost = null;
+
+const messageCost = 10;
 
 
-    const avatar =
-        params.get("avatar");
+/* =========================
+   GET HOST
+========================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
 
 
-    document.getElementById("hostName").textContent =
-        currentHost;
+currentHost =
+    params.get("name") || "Amy";
 
 
-    if (avatar) {
-
-        document.getElementById("hostAvatar").src =
-            avatar;
-
-    }
+document.getElementById(
+    "hostName"
+).textContent =
+    currentHost;
 
 
-    // ==============================
-    // DISPLAY MESSAGE
-    // ==============================
+/* =========================
+   INIT
+========================= */
 
-    function displayMessage(message) {
+async function init() {
 
-        const chatArea =
-            document.getElementById("chatArea");
+    try {
 
+        /*
+         * Get logged-in
+         * Supabase Auth user
+         */
 
-        const empty =
-            document.getElementById("emptyMessage");
-
-
-        if (empty) {
-
-            empty.remove();
-
-        }
-
-
-        const div =
-            document.createElement("div");
+        const {
+            data,
+            error
+        } =
+        await supabaseClient
+        .auth
+        .getUser();
 
 
-        div.classList.add("message");
+        if (error || !data.user) {
 
+            window.location.href =
+                "login.html";
 
-        if (message.sender === currentUser) {
-
-            div.classList.add("mine");
-
-        } else {
-
-            div.classList.add("theirs");
+            return;
 
         }
 
 
-        div.textContent =
-            message.message;
+        currentAuthUser =
+            data.user;
 
 
-        chatArea.appendChild(div);
+        /*
+         * Get Profile
+         */
+
+        const {
+            data: profile,
+            error: profileError
+        } =
+        await supabaseClient
+        .from("Profile")
+        .select("*")
+        .eq(
+            "auth_id",
+            currentAuthUser.id
+        )
+        .single();
 
 
-        chatArea.scrollTop =
-            chatArea.scrollHeight;
-
-    }
-
-
-    // ==============================
-    // LOAD OLD MESSAGES
-    // ==============================
-
-    async function loadMessages() {
-
-        const { data, error } =
-            await supabaseClient
-            .from("Message")
-            .select("*")
-            .or(
-                `and(sender.eq.${currentUser},receiver.eq.${currentHost}),and(sender.eq.${currentHost},receiver.eq.${currentUser})`
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: true
-                }
-            );
-
-
-        if (error) {
+        if (profileError || !profile) {
 
             console.error(
-                "Load messages error:",
-                error
+                profileError
+            );
+
+            alert(
+                "Profile not found."
             );
 
             return;
@@ -385,337 +529,548 @@
         }
 
 
-        data.forEach(
-            function(message) {
+        currentProfile =
+            profile;
 
-                displayMessage(message);
 
-            }
+        currentUser =
+            profile.username;
+
+
+        /*
+         * Show balance
+         */
+
+        updateBalance(
+            profile.diamonds
         );
+
+
+        /*
+         * Load messages
+         */
+
+        await loadMessages();
+
+
+        /*
+         * Start realtime
+         */
+
+        startRealtime();
+
+
+    } catch (error) {
+
+        console.error(error);
 
     }
 
-
-    // ==============================
-    // LOAD DIAMOND BALANCE
-    // ==============================
-
-    async function loadDiamonds() {
-
-        const { data, error } =
-            await supabaseClient
-            .from("Profile")
-            .select("diamonds")
-            .ilike(
-                "username",
-                currentUser
-            )
-            .single();
+}
 
 
-        if (error) {
+/* =========================
+   BALANCE
+========================= */
 
-            console.error(
-                "Diamond load error:",
-                error
-            );
+function updateBalance(
+    diamonds
+) {
 
-            return;
+    document.getElementById(
+        "balance"
+    ).textContent =
+        "💎 " +
+        Number(
+            diamonds || 0
+        ).toLocaleString();
 
-        }
+}
 
 
-        updateDiamondDisplay(
+/* =========================
+   LOAD BALANCE
+========================= */
+
+async function loadBalance() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+    await supabaseClient
+    .from("Profile")
+    .select("diamonds")
+    .eq(
+        "auth_id",
+        currentAuthUser.id
+    )
+    .single();
+
+
+    if (!error && data) {
+
+        updateBalance(
             data.diamonds
         );
 
     }
 
+}
 
-    // ==============================
-    // UPDATE DIAMOND DISPLAY
-    // ==============================
 
-    function updateDiamondDisplay(
-        amount
-    ) {
+/* =========================
+   LOAD MESSAGES
+========================= */
 
+async function loadMessages() {
+
+    const chatArea =
         document.getElementById(
-            "diamondBalance"
-        ).textContent =
-            "💎 " +
-            Number(amount).toLocaleString();
-
-    }
-
-
-    // ==============================
-    // SEND MESSAGE
-    // ==============================
-
-    async function sendMessage() {
-
-        const input =
-            document.getElementById(
-                "messageInput"
-            );
-
-
-        const button =
-            document.getElementById(
-                "sendButton"
-            );
-
-
-        const message =
-            input.value.trim();
-
-
-        if (!message) {
-
-            return;
-
-        }
-
-
-        button.disabled = true;
-
-
-        input.disabled = true;
-
-
-        // ==========================
-        // DIAMOND RPC
-        // ==========================
-
-        const { data, error } =
-            await supabaseClient
-            .rpc(
-                "send_chat_message",
-                {
-                    p_sender:
-                        currentUser,
-
-                    p_receiver:
-                        currentHost,
-
-                    p_message:
-                        message
-                }
-            );
-
-
-        if (error) {
-
-            console.error(
-                "Send message error:",
-                error
-            );
-
-            alert(
-                "Message failed to send."
-            );
-
-
-            button.disabled = false;
-
-            input.disabled = false;
-
-            return;
-
-        }
-
-
-        console.log(
-            "Diamond result:",
-            data
+            "chatArea"
         );
 
 
-        // ==========================
-        // CHECK RESULT
-        // ==========================
-
-        if (
-            !data ||
-            data.success !== true
-        ) {
-
-            if (
-                data &&
-                data.error ===
-                "Not enough diamonds"
-            ) {
-
-                alert(
-                    "Not enough diamonds 💎"
-                );
-
-            } else {
-
-                alert(
-                    data?.error ||
-                    "Message failed to send."
-                );
-
-            }
-
-
-            button.disabled = false;
-
-            input.disabled = false;
-
-            return;
-
+    const {
+        data,
+        error
+    } =
+    await supabaseClient
+    .from("Message")
+    .select("*")
+    .or(
+        "and(sender.eq." +
+        encodeURIComponent(currentUser) +
+        ",receiver.eq." +
+        encodeURIComponent(currentHost) +
+        "),and(sender.eq." +
+        encodeURIComponent(currentHost) +
+        ",receiver.eq." +
+        encodeURIComponent(currentUser) +
+        ")"
+    )
+    .order(
+        "created_at",
+        {
+            ascending: true
         }
+    );
 
 
-        // ==========================
-        // SUCCESS
-        // ==========================
+    if (error) {
 
-        input.value = "";
+        console.error(error);
 
+        chatArea.innerHTML =
+            '<div class="loading">Unable to load messages.</div>';
 
-        // Reload balance
-
-        await loadDiamonds();
-
-
-        button.disabled = false;
-
-        input.disabled = false;
-
-
-        input.focus();
+        return;
 
     }
 
 
-    // ==============================
-    // REALTIME
-    // ==============================
+    chatArea.innerHTML = "";
 
-    const channel =
-        supabaseClient
+
+    if (!data || data.length === 0) {
+
+        chatArea.innerHTML =
+            '<div class="loading">Start a conversation ❤️</div>';
+
+        return;
+
+    }
+
+
+    data.forEach(function(row) {
+
+        addMessageToScreen(
+            row
+        );
+
+    });
+
+
+    scrollToBottom();
+
+}
+
+
+/* =========================
+   DISPLAY MESSAGE
+========================= */
+
+function addMessageToScreen(
+    row
+) {
+
+    const chatArea =
+        document.getElementById(
+            "chatArea"
+        );
+
+
+    const isMe =
+        row.sender.toLowerCase() ===
+        currentUser.toLowerCase();
+
+
+    const rowDiv =
+        document.createElement("div");
+
+
+    rowDiv.className =
+        "message-row " +
+        (isMe ? "me" : "host");
+
+
+    const messageDiv =
+        document.createElement("div");
+
+
+    messageDiv.className =
+        "message";
+
+
+    messageDiv.textContent =
+        row.message;
+
+
+    const timeDiv =
+        document.createElement("div");
+
+
+    timeDiv.className =
+        "time";
+
+
+    const date =
+        new Date(
+            row.created_at
+        );
+
+
+    timeDiv.textContent =
+        date.toLocaleTimeString(
+            [],
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+
+    messageDiv.appendChild(
+        timeDiv
+    );
+
+
+    rowDiv.appendChild(
+        messageDiv
+    );
+
+
+    chatArea.appendChild(
+        rowDiv
+    );
+
+}
+
+
+/* =========================
+   REALTIME
+========================= */
+
+function startRealtime() {
+
+    supabaseClient
         .channel(
-            "love-demo-chat"
+            "chat-" +
+            currentUser +
+            "-" +
+            currentHost
         )
         .on(
             "postgres_changes",
             {
                 event: "INSERT",
-
                 schema: "public",
-
                 table: "Message"
             },
-
             function(payload) {
 
-                const message =
+                const row =
                     payload.new;
 
 
-                const isCurrentChat =
+                const match =
+
                     (
-                        message.sender ===
-                        currentUser &&
-                        message.receiver ===
-                        currentHost
+                        row.sender
+                            .toLowerCase() ===
+                        currentUser.toLowerCase()
+
+                        &&
+                        row.receiver
+                            .toLowerCase() ===
+                        currentHost.toLowerCase()
                     )
+
                     ||
+
                     (
-                        message.sender ===
-                        currentHost &&
-                        message.receiver ===
-                        currentUser
+                        row.sender
+                            .toLowerCase() ===
+                        currentHost.toLowerCase()
+
+                        &&
+                        row.receiver
+                            .toLowerCase() ===
+                        currentUser.toLowerCase()
                     );
 
 
-                if (
-                    isCurrentChat
-                ) {
-
-                    displayMessage(
-                        message
-                    );
-
+                if (!match) {
+                    return;
                 }
 
-            }
-        )
-        .subscribe(
-            function(status) {
 
-                console.log(
-                    "Realtime status:",
-                    status
+                /*
+                 * Avoid duplicate display
+                 * for messages we already added
+                 */
+
+                const existing =
+                    document.querySelector(
+                        '[data-message-id="' +
+                        row.id +
+                        '"]'
+                    );
+
+
+                if (existing) {
+                    return;
+                }
+
+
+                addMessageToScreen(
+                    row
                 );
 
+
+                scrollToBottom();
+
+
+                loadBalance();
+
             }
-        );
-
-
-    // ==============================
-    // ENTER KEY
-    // ==============================
-
-    document
-        .getElementById(
-            "messageInput"
         )
-        .addEventListener(
-            "keydown",
-            function(event) {
+        .subscribe();
 
-                if (
-                    event.key ===
-                    "Enter"
-                ) {
+}
 
-                    sendMessage();
 
-                }
+/* =========================
+   SEND MESSAGE
+========================= */
 
+async function sendMessage() {
+
+    const input =
+        document.getElementById(
+            "messageInput"
+        );
+
+
+    const button =
+        document.getElementById(
+            "sendButton"
+        );
+
+
+    const message =
+        input.value.trim();
+
+
+    if (!message) {
+        return;
+    }
+
+
+    if (!currentUser) {
+
+        alert(
+            "Please login first."
+        );
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+
+    try {
+
+        /*
+         * Use existing RPC
+         *
+         * send_chat_message
+         */
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient
+        .rpc(
+            "send_chat_message",
+            {
+                p_sender:
+                    currentUser,
+
+                p_receiver:
+                    currentHost,
+
+                p_message:
+                    message
             }
         );
 
 
-    // ==============================
-    // START
-    // ==============================
+        if (error) {
 
-    loadMessages();
+            console.error(error);
 
-    loadDiamonds();
+            alert(
+                error.message
+            );
 
-window.addEventListener(
-    "pageshow",
-    function() {
-        loadDiamonds();
-    }
-);
+            button.disabled = false;
 
-document.addEventListener(
-    "visibilitychange",
-    function() {
-
-        if (
-            document.visibilityState ===
-            "visible"
-        ) {
-
-            loadDiamonds();
+            return;
 
         }
 
+
+        /*
+         * RPC returns:
+         *
+         * success: true
+         * cost: 10
+         */
+
+        if (!data || data.success !== true) {
+
+            alert(
+                data?.error ||
+                "Unable to send message."
+            );
+
+            button.disabled = false;
+
+            return;
+
+        }
+
+
+        /*
+         * Clear input
+         */
+
+        input.value = "";
+
+
+        /*
+         * Refresh balance
+         */
+
+        await loadBalance();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Something went wrong."
+        );
+
     }
-);
-    
+
+
+    button.disabled = false;
+
+}
+
+
+/* =========================
+   ENTER
+========================= */
+
+function handleEnter(
+    event
+) {
+
+    if (
+        event.key === "Enter"
+    ) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+}
+
+
+/* =========================
+   SCROLL
+========================= */
+
+function scrollToBottom() {
+
+    const chatArea =
+        document.getElementById(
+            "chatArea"
+        );
+
+
+    chatArea.scrollTop =
+        chatArea.scrollHeight;
+
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+function goHome() {
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+init();
+
 </script>
 
 
 </body>
 
 </html>
+```
