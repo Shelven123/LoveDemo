@@ -6,10 +6,7 @@
 
 <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>LoveDemo Host Chat</title>
 
@@ -31,9 +28,7 @@ body {
 }
 
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 .header {
     height: 65px;
@@ -91,9 +86,7 @@ body {
 }
 
 
-/* =========================
-   CHAT
-========================= */
+/* CHAT */
 
 .chat-area {
     flex: 1;
@@ -158,9 +151,7 @@ body {
 }
 
 
-/* =========================
-   INPUT
-========================= */
+/* INPUT */
 
 .input-area {
     background: white;
@@ -210,13 +201,10 @@ body {
 
 .send-button:disabled {
     background: #ccc;
-    cursor: not-allowed;
 }
 
 
-/* =========================
-   HOST INFO
-========================= */
+/* INFO */
 
 .host-info {
     text-align: center;
@@ -229,9 +217,7 @@ body {
 }
 
 
-/* =========================
-   ERROR
-========================= */
+/* ERROR */
 
 .error-box {
     margin: 20px 15px;
@@ -259,10 +245,6 @@ body {
 <body>
 
 
-<!-- =========================
-     HEADER
-========================= -->
-
 <div class="header">
 
     <div class="left-header">
@@ -274,14 +256,13 @@ body {
             ←
         </button>
 
-
         <div>
 
             <div
                 id="customerName"
                 class="customer-name"
             >
-                Loading...
+                Finding customer...
             </div>
 
             <div class="online">
@@ -304,26 +285,18 @@ body {
 
 
 
-<!-- =========================
-     CHAT AREA
-========================= -->
-
 <div
     id="chatArea"
     class="chat-area"
 >
 
     <div class="loading">
-        Loading messages...
+        Finding latest conversation...
     </div>
 
 </div>
 
 
-
-<!-- =========================
-     INPUT
-========================= -->
 
 <div class="host-info">
     Host replies are free
@@ -338,14 +311,15 @@ body {
         type="text"
         placeholder="Reply to customer..."
         autocomplete="off"
+        disabled
         onkeydown="handleEnter(event)"
     >
-
 
     <button
         id="sendButton"
         class="send-button"
         onclick="sendMessage()"
+        disabled
     >
         ➤
     </button>
@@ -388,25 +362,7 @@ let currentHost = null;
 
 let currentCustomer = null;
 
-
-/* =========================
-   GET CUSTOMER
-========================= */
-
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
-
-
-currentCustomer =
-    params.get("user") || "Vincent";
-
-
-document.getElementById(
-    "customerName"
-).textContent =
-    currentCustomer;
+let realtimeChannel = null;
 
 
 /* =========================
@@ -418,7 +374,7 @@ async function init() {
     try {
 
         /*
-         * Get logged-in Auth user
+         * Check login
          */
 
         const {
@@ -430,7 +386,10 @@ async function init() {
         .getUser();
 
 
-        if (error || !data.user) {
+        if (
+            error ||
+            !data.user
+        ) {
 
             window.location.href =
                 "login.html";
@@ -445,7 +404,7 @@ async function init() {
 
 
         /*
-         * Find Profile
+         * Find Host Profile
          */
 
         const {
@@ -477,8 +436,7 @@ async function init() {
 
 
         /*
-         * Make sure this account
-         * is actually a Host
+         * Make sure Host
          */
 
         if (
@@ -502,20 +460,16 @@ async function init() {
             profile.username;
 
 
-        /*
-         * Show host balance
-         */
-
         updateBalance(
             profile.diamonds
         );
 
 
         /*
-         * Load messages
+         * Find latest customer
          */
 
-        await loadMessages();
+        await findLatestCustomer();
 
 
         /*
@@ -539,77 +493,100 @@ async function init() {
 
 
 /* =========================
-   ERROR
+   FIND LATEST CUSTOMER
 ========================= */
 
-function showError(
-    message
-) {
-
-    document.getElementById(
-        "chatArea"
-    ).innerHTML =
-
-        '<div class="error-box">' +
-        message +
-        '<br><br>' +
-        '<a href="login.html">Back to Login</a>' +
-        '</div>';
-
-}
-
-
-/* =========================
-   BALANCE
-========================= */
-
-function updateBalance(
-    diamonds
-) {
-
-    document.getElementById(
-        "balance"
-    ).textContent =
-        "💎 " +
-        Number(
-            diamonds || 0
-        ).toLocaleString();
-
-}
-
-
-/* =========================
-   LOAD BALANCE
-========================= */
-
-async function loadBalance() {
-
-    if (!currentAuthUser) {
-        return;
-    }
-
+async function findLatestCustomer() {
 
     const {
         data,
         error
     } =
     await supabaseClient
-    .from("Profile")
-    .select("diamonds")
-    .eq(
-        "auth_id",
-        currentAuthUser.id
+    .from("Message")
+    .select("*")
+    .or(
+        "sender.eq." +
+        currentHost +
+        ",receiver.eq." +
+        currentHost
     )
-    .single();
+    .order(
+        "created_at",
+        {
+            ascending: false
+        }
+    )
+    .limit(1);
 
 
-    if (!error && data) {
+    if (error) {
 
-        updateBalance(
-            data.diamonds
+        console.error(error);
+
+        showError(
+            "Unable to find conversation."
         );
 
+        return;
+
     }
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        document.getElementById(
+            "customerName"
+        ).textContent =
+            "No customer yet";
+
+        document.getElementById(
+            "chatArea"
+        ).innerHTML =
+            '<div class="loading">No messages yet.</div>';
+
+        return;
+
+    }
+
+
+    const latestMessage =
+        data[0];
+
+
+    /*
+     * Determine the other person
+     */
+
+    if (
+        latestMessage.sender.toLowerCase() ===
+        currentHost.toLowerCase()
+    ) {
+
+        currentCustomer =
+            latestMessage.receiver;
+
+    } else {
+
+        currentCustomer =
+            latestMessage.sender;
+
+    }
+
+
+    document.getElementById(
+        "customerName"
+    ).textContent =
+        currentCustomer;
+
+
+    enableInput();
+
+
+    await loadMessages();
 
 }
 
@@ -619,6 +596,11 @@ async function loadBalance() {
 ========================= */
 
 async function loadMessages() {
+
+    if (!currentCustomer) {
+        return;
+    }
+
 
     const chatArea =
         document.getElementById(
@@ -663,28 +645,24 @@ async function loadMessages() {
                 return (
 
                     (
-                        row.sender
-                            .toLowerCase() ===
+                        row.sender.toLowerCase() ===
                         currentHost.toLowerCase()
 
                         &&
 
-                        row.receiver
-                            .toLowerCase() ===
+                        row.receiver.toLowerCase() ===
                         currentCustomer.toLowerCase()
                     )
 
                     ||
 
                     (
-                        row.sender
-                            .toLowerCase() ===
+                        row.sender.toLowerCase() ===
                         currentCustomer.toLowerCase()
 
                         &&
 
-                        row.receiver
-                            .toLowerCase() ===
+                        row.receiver.toLowerCase() ===
                         currentHost.toLowerCase()
                     )
 
@@ -721,7 +699,7 @@ async function loadMessages() {
 
 
 /* =========================
-   DISPLAY MESSAGE
+   ADD MESSAGE
 ========================= */
 
 function addMessageToScreen(
@@ -823,12 +801,11 @@ function addMessageToScreen(
 
 function startRealtime() {
 
-    supabaseClient
+    realtimeChannel =
+        supabaseClient
         .channel(
-            "host-chat-" +
-            currentHost +
-            "-" +
-            currentCustomer
+            "host-auto-chat-" +
+            currentHost
         )
         .on(
             "postgres_changes",
@@ -837,42 +814,131 @@ function startRealtime() {
                 schema: "public",
                 table: "Message"
             },
-            function(payload) {
+            async function(payload) {
 
                 const row =
                     payload.new;
 
 
+                /*
+                 * If this message is
+                 * from the Host
+                 */
+
+                if (
+                    row.sender.toLowerCase() ===
+                    currentHost.toLowerCase()
+                ) {
+
+                    if (
+                        !currentCustomer
+                    ) {
+
+                        currentCustomer =
+                            row.receiver;
+
+                        document.getElementById(
+                            "customerName"
+                        ).textContent =
+                            currentCustomer;
+
+                        enableInput();
+
+                    }
+
+                }
+
+
+                /*
+                 * If customer sends
+                 * message to Host
+                 */
+
+                if (
+                    row.receiver.toLowerCase() ===
+                    currentHost.toLowerCase()
+                ) {
+
+                    /*
+                     * If no customer selected,
+                     * automatically select this user.
+                     */
+
+                    if (
+                        !currentCustomer
+                    ) {
+
+                        currentCustomer =
+                            row.sender;
+
+                        document.getElementById(
+                            "customerName"
+                        ).textContent =
+                            currentCustomer;
+
+                        enableInput();
+
+                        await loadMessages();
+
+                        loadBalance();
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Ignore messages
+                     * from other customers
+                     */
+
+                    if (
+                        row.sender.toLowerCase() !==
+                        currentCustomer.toLowerCase()
+                    ) {
+
+                        return;
+
+                    }
+
+                }
+
+
+                /*
+                 * Only display current conversation
+                 */
+
+                if (
+                    !currentCustomer
+                ) {
+
+                    return;
+
+                }
+
+
                 const match =
 
                     (
-
-                        row.sender
-                            .toLowerCase() ===
+                        row.sender.toLowerCase() ===
                         currentHost.toLowerCase()
 
                         &&
 
-                        row.receiver
-                            .toLowerCase() ===
+                        row.receiver.toLowerCase() ===
                         currentCustomer.toLowerCase()
-
                     )
 
                     ||
 
                     (
-
-                        row.sender
-                            .toLowerCase() ===
+                        row.sender.toLowerCase() ===
                         currentCustomer.toLowerCase()
 
                         &&
 
-                        row.receiver
-                            .toLowerCase() ===
+                        row.receiver.toLowerCase() ===
                         currentHost.toLowerCase()
-
                     );
 
 
@@ -902,10 +968,6 @@ function startRealtime() {
                 scrollToBottom();
 
 
-                /*
-                 * Refresh Host earnings
-                 */
-
                 loadBalance();
 
             }
@@ -920,6 +982,16 @@ function startRealtime() {
 ========================= */
 
 async function sendMessage() {
+
+    if (
+        !currentHost ||
+        !currentCustomer
+    ) {
+
+        return;
+
+    }
+
 
     const input =
         document.getElementById(
@@ -942,75 +1014,134 @@ async function sendMessage() {
     }
 
 
-    if (!currentHost) {
+    button.disabled = true;
+
+
+    const {
+        error
+    } =
+    await supabaseClient
+    .from("Message")
+    .insert({
+
+        sender:
+            currentHost,
+
+        receiver:
+            currentCustomer,
+
+        message:
+            message
+
+    });
+
+
+    if (error) {
+
+        console.error(error);
 
         alert(
-            "Host account not ready."
+            error.message
         );
+
+        button.disabled = false;
 
         return;
 
     }
 
 
-    button.disabled = true;
+    input.value = "";
+
+    button.disabled = false;
+
+}
 
 
-    try {
+/* =========================
+   ENABLE INPUT
+========================= */
 
-        /*
-         * Host reply is free.
-         */
+function enableInput() {
 
-        const {
-            error
-        } =
-        await supabaseClient
-        .from("Message")
-        .insert({
-
-            sender:
-                currentHost,
-
-            receiver:
-                currentCustomer,
-
-            message:
-                message
-
-        });
+    document.getElementById(
+        "messageInput"
+    ).disabled = false;
 
 
-        if (error) {
+    document.getElementById(
+        "sendButton"
+    ).disabled = false;
 
-            console.error(error);
-
-            alert(
-                error.message
-            );
-
-            button.disabled = false;
-
-            return;
-
-        }
+}
 
 
-        input.value = "";
+/* =========================
+   BALANCE
+========================= */
+
+async function loadBalance() {
+
+    const {
+        data,
+        error
+    } =
+    await supabaseClient
+    .from("Profile")
+    .select("diamonds")
+    .eq(
+        "auth_id",
+        currentAuthUser.id
+    )
+    .single();
 
 
-    } catch (error) {
+    if (
+        !error &&
+        data
+    ) {
 
-        console.error(error);
-
-        alert(
-            "Unable to send message."
+        updateBalance(
+            data.diamonds
         );
 
     }
 
+}
 
-    button.disabled = false;
+
+function updateBalance(
+    diamonds
+) {
+
+    document.getElementById(
+        "balance"
+    ).textContent =
+        "💎 " +
+        Number(
+            diamonds || 0
+        ).toLocaleString();
+
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+function showError(
+    message
+) {
+
+    document.getElementById(
+        "chatArea"
+    ).innerHTML =
+
+        '<div class="error-box">' +
+        message +
+        '<br><br>' +
+        '<a href="login.html">Back to Login</a>' +
+        '</div>';
 
 }
 
@@ -1073,7 +1204,6 @@ function goHome() {
 init();
 
 </script>
-
 
 </body>
 
